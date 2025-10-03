@@ -2,6 +2,84 @@
 title: "SLE777_Renee Carroll_Assessment 4"
 author: "Renee Carroll"
 date: "2025-09-25"
-output: html_document
+output: 
+  html_document:
+    toc: yes
+    fig_width: 7
+    fig_height: 7
+theme: yeti
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# 1. Read in the file, making the gene identifiers the row names. Show a table of values for the first six genes.
+
+```{r download files from GitHub, and show first 6 genes}
+URL1 = "https://raw.githubusercontent.com/ghazkha/Assessment4/refs/heads/main/gene_expression.tsv"
+download.file(URL1, destfile="gene_expression.tsv")
+gene_expression <- read.delim("gene_expression.tsv", header = TRUE, row.names = 1, sep = "\t", stringsAsFactors = FALSE)
+head(gene_expression)
+```
+
+# 2. Make a new column which is the mean of the other columns. Show a table of values for the first six genes.
+
+```{r mean saved as new column}
+gene_expression$mean_expression <- rowMeans(gene_expression)
+head(gene_expression)
+```
+
+# 3. List the 10 genes with the highest mean expression
+
+```{r 10 genes with highest mean - whole table}
+ordered_expression <- gene_expression[order(-gene_expression$mean_expression),]
+genes_highest_expression <- head(ordered_expression, 10)
+genes_highest_expression
+```
+
+# Listing just the 10 gene names
+
+```{r 10 genes with highest mean - just names as a list}
+rownames(genes_highest_expression)
+```
+
+# 4. Determine the number of genes with a mean < 10
+
+```{r number of genes with low expression < 10}
+low_exp_genes <- subset(gene_expression, mean_expression<10)
+nrow(low_exp_genes)
+```
+
+# 5. Make a histogram plot of the mean values and include it into your report.
+
+```{r histogram}
+hist(gene_expression$mean_expression, breaks=1000, main = "Mean Gene Expression", xlab="Mean Gene Expression", col="dodgerblue2")
+```
+
+As the data is highly positively skewed, it is best represented on a logarithmic scale.
+
+
+```{r histogram of log of values}
+gene_subset_expressionhigherthan10 <- subset(gene_expression, mean_expression>10)
+log_gene_subset_expressionhigherthan10 <- log(gene_subset_expressionhigherthan10)
+hist(log_gene_subset_expressionhigherthan10$mean_expression, breaks=50, main = "Mean Gene Expression", xlab = "Log Mean Gene Expression", col = "dodgerblue2")
+```
+
+Try that again, using log+1, as log of 0 gives infinity... does this make a difference to how the graph looks?
+
+
+```{r histogram of log of values+1}
+gene_subset_expressionhigherthan10 <- subset(gene_expression, mean_expression>10)
+log_gene_subset_expressionhigherthan10 <- log(gene_subset_expressionhigherthan10+1)
+hist(log_gene_subset_expressionhigherthan10$mean_expression, breaks=50, main = "Mean Gene Expression", xlab = "Log Mean Gene Expression", col = "dodgerblue2")
+```
+
+
+
+
+
+```{r Recording Session Info}
+sessionInfo()
+```
