@@ -14,6 +14,8 @@ theme: yeti
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Part 1
+The file “gene_expression.tsv” contains RNA-seq count data for three samples of interest.
 
 # 1. Read in the file, making the gene identifiers the row names. Show a table of values for the first six genes.
 
@@ -75,6 +77,103 @@ gene_subset_expressionhigherthan10 <- subset(gene_expression, mean_expression>10
 log_gene_subset_expressionhigherthan10 <- log(gene_subset_expressionhigherthan10+1)
 hist(log_gene_subset_expressionhigherthan10$mean_expression, breaks=50, main = "Mean Gene Expression", xlab = "Log Mean Gene Expression", col = "dodgerblue2")
 ```
+
+## Part 2
+The file “growth_data.csv” contains measurements for tree circumference growing at two sites, control site and treatment site which were planted 20 years ago.
+
+# 6. Import this csv file into an R object. What are the column names?
+
+```{r Import csv file}
+URL2 = "https://raw.githubusercontent.com/ghazkha/Assessment4/refs/heads/main/growth_data.csv"
+download.file(URL2, destfile="growth_data.csv")
+growth_data <- read.csv("growth_data.csv") # read.csv automatically treats the first row as headings, therefore you don't need to specify it in the code
+```
+
+```{r determine column names}
+colnames(growth_data)
+```
+
+
+
+
+
+# 7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
+
+```{r northeast site, mean of tree circumferences, start of study}
+mean(subset(growth_data, Site == "northeast")$Circumf_2005_cm)
+```
+
+```{r northeast site, standard deviation of tree circumferences, start of study}
+sd(subset(growth_data, Site == "northeast")$Circumf_2005_cm)
+```
+
+```{r northeast site, mean of tree circumferences, end of study}
+mean(subset(growth_data, Site == "northeast")$Circumf_2020_cm)
+```
+
+```{r northeast site, standard deviation of tree circumferences, end of study}
+sd(subset(growth_data, Site == "northeast")$Circumf_2020_cm)
+```
+
+```{r southwest site, mean of tree circumferences, start of study}
+mean(subset(growth_data, Site == "southwest")$Circumf_2005_cm)
+```
+
+```{r southwest site, standard deviation of tree circumferences, start of study}
+sd(subset(growth_data, Site == "southwest")$Circumf_2005_cm)
+```
+
+```{r southwest site, mean of tree circumferences, end of study}
+mean(subset(growth_data, Site == "southwest")$Circumf_2020_cm)
+```
+
+```{r southwest site, standard deviation of tree circumferences, end of study}
+sd(subset(growth_data, Site == "southwest")$Circumf_2020_cm)
+```
+
+# 8. Make a box plot of tree circumference at the start and end of the study at both sites.
+
+```{r boxplot of tree circumference at the start and end of the study at both sites}
+boxplot(subset(growth_data, Site == "northeast")$Circumf_2005_cm, subset(growth_data, Site == "northeast")$Circumf_2020_cm, subset(growth_data, Site == "southwest")$Circumf_2005_cm, subset(growth_data, Site == "southwest")$Circumf_2020_cm, names = c("Northeast 2005", "Northeast 2020", "Southwest 2005", "Southwest 2020"), ylab = "Circumference (cm)", main = "Increase in tree girth between 2005 and 2020, at each study site")
+```
+
+# 9. Calculate the mean growth over the last 10 years at each site.
+
+```{r mean growth over the last 10 years, northeast site}
+growth_data$growth_2010_2020 <- growth_data$Circumf_2020_cm-growth_data$Circumf_2010_cm
+mean(subset(growth_data, Site == "northeast")$growth_2010_2020)
+```
+```{r mean growth over the last 10 years, southwest site}
+mean(subset(growth_data, Site == "southwest")$growth_2010_2020)
+```
+
+# 10. Use the t.test to estimate the p-value that the 10 year growth is different at the two sites.
+The t.test() function returns an object containing various information, including:
+t-statistic: The calculated t-value.
+df: Degrees of freedom.
+p-value: The probability of observing a t-statistic as extreme as, or more extreme than, the calculated one, assuming the null hypothesis is true. A small p-value (typically < 0.05) suggests evidence against the null hypothesis.
+confidence interval: A range within which the true population mean difference (for two-sample tests) or population mean (for one-sample tests) is likely to fall.
+sample means: The means of the groups or sample.
+
+Assumptions:
+T-tests rely on assumptions like normality of data (or residuals for two-sample tests) and, for independent samples, potentially equality of variances. You may need to check these assumptions before interpreting the results.
+
+```{r test for normality in the northeast data}
+hist(subset(growth_data, Site == "northeast")$growth_2010_2020, breaks = 20)
+```
+
+```{r test for normality in the southwest data}
+hist(subset(growth_data, Site == "southwest")$growth_2010_2020, breaks = 20)
+```
+
+
+```{r t.test, not assuming equal variance (Welch t.test)}
+t.test(growth_2010_2020 ~ Site, data = growth_data, var.equal = FALSE) #var.equal = TRUE: Include this if you assume equal variances between the groups (for a Student's t-test). Omit or set to FALSE for Welch's t-test (which doesn't assume equal variances).
+```
+```{r t.test, assuming equal variance}
+t.test(growth_2010_2020 ~ Site, data = growth_data, var.equal = TRUE) #var.equal = TRUE: Include this if you assume equal variances between the groups (for a Student's t-test). Omit or set to FALSE for Welch's t-test (which doesn't assume equal variances).
+```
+
 
 
 
