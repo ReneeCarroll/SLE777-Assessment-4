@@ -196,7 +196,6 @@ suppressPackageStartupMessages({
 
 # 1. Download the whole set of coding DNA sequences for E. coli and your organism of interest. How many coding sequences are present in these organisms? Present this in the form of a table. Describe any differences between the two organisms. 
 
-
 ```{r Download E.coli genome}
 URL3 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
 download.file(URL3, destfile="ecoli_cds.fa.gz")
@@ -208,31 +207,73 @@ URL4 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacte
 download.file(URL4, destfile="aaceti_cds.fa.gz")
 gunzip("aaceti_cds.fa.gz")
 ```
-
-```{r Table of the number of coding sequences present in these organisms}
-
+```{r reading in the two sequence data files}
+ecoli_cds <- seqinr::read.fasta("ecoli_cds.fa")
+aaceti_cds <- seqinr::read.fasta("aaceti_cds.fa")
 ```
 
-# Describe any differences between the two organisms. 
+```{r}
+str(head(ecoli_cds))
+```
 
+```{r}
+str(head(aaceti_cds))
+```
+
+
+
+```{r Table of the number of coding sequences present in these organisms}
+install.packages("data.table")
+library(data.table)
+cds_table_number <- data.table(Organism = c("E.coli", "A.aceti"), "Number of Coding Sequences" = c(length(ecoli_cds), length(aaceti_cds)))
+print(cds_table_number)
+```
+# Describe any differences between the two organisms. 
+```{r percentage increase in number of coding sequences}
+percentage_increase <- (length(ecoli_cds)-length(aaceti_cds))/length(aaceti_cds)*100
+print(percentage_increase)
+```
+The organism E.coli contains 24.6% more genes than the organism A.aceti, suggesting E.coli is a more complex organism.
 
 # 2. How much coding DNA is there in total for these two organisms? Present this in the form of a table. Describe any differences between the two organisms.
 ```{r Table of the total amount of coding DNA for the two organisms}
-
+length_ecoli_genes <- as.numeric(summary(ecoli_cds)[,1])
+length_aaceti_genes <- as.numeric(summary(aaceti_cds)[,1])
+cds_table_total <- data.table(Organism = c("E.coli", "A.aceti"), "Total Amount of Coding Sequence" = c(sum(length_ecoli_genes), sum(length_aaceti_genes)))
+print(cds_table_total)
 ```
 # Describe any differences between the two organisms. 
+```{r percentage increase in total amount of coding sequences}
+percentage_increase_total <- (sum(length_ecoli_genes)-sum(length_aaceti_genes))/sum(length_aaceti_genes)*100
+print(percentage_increase_total)
+```
+In line with a 24.6% increase in genes, E.coli contains a proportional increase in total coding sequence, with an increase of 22.9% above the total amount of coding DNA contained in A.aceti organisms.
 
 
 # 3. Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms. What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms.
 ```{r Boxplot of coding sequence length in these organisms}
-
+boxplot(length_ecoli_genes, length_aaceti_genes, names = c("E.coli", "A.aceti"), main = "Coding DNA Sequence Length in E.coli and A.aceti", ylab="Length (bp)")
 ```
 
 ```{r Mean and median coding sequence length in these organisms}
-
+cds_table_stats <- data.table(Organism = c("E.coli", "A.aceti"), "Mean cDNA Sequence Length" = c(mean(length_ecoli_genes), mean(length_aaceti_genes)), "Median cDNA Sequence Length" = c(median(length_ecoli_genes), median(length_aaceti_genes)))
+print(cds_table_stats)
 ```
 
 # Describe any differences between the two organisms. 
+
+
+```{r}
+d_ecoli <- density(length_ecoli_genes)
+d_aaceti <- density(length_aaceti_genes)
+plot(d_ecoli, col="red", main = "Density plot of coding DNA sequence lengths", xlab = "cDNA length")
+lines(d_aaceti, col="blue")
+text(x = 6000, y = 6e-04, labels = "E.coli", col = "red", cex = 1.2)
+text(x = 6000, y = 5e-04, labels = "A.aceti", col = "blue", cex = 1.2)
+```
+
+
+
 
 # 4. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
 ```{r bar plots for frequency of DNA bases in the total coding sequences for both organisms}
