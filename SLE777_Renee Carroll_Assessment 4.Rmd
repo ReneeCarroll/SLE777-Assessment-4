@@ -332,7 +332,7 @@ library("ggpubr")
 ```
 
 Making the bar graphs
-```{r}
+```{r bar chart for nucleotide frequencies}
 #Defining the variables for the grouped bar chart
 Organism <- proportion_df$Organism
 Nucleotide <- proportion_df$Nucleotide
@@ -349,10 +349,69 @@ ggbarplot(data=proportion_df, x="Nucleotide", y="Proportion", fill="Organism", p
 
 
 ```{r translating the coding sequences}
+#translate the cDNA from E.coli
+#the lapply function performs a loop, applying the 'translate' code to all elements of the 'ecoli_cds' data, and saving the protein sequences to the 'ecoli_prot' object.
+ecoli_prot <- lapply(ecoli_cds, translate)
+#translate the cDNA from A.aceti
+aaceti_prot <- lapply(aaceti_cds, translate)
+```
 
+```{r}
+head(ecoli_prot)
+```
+
+```{r}
+ecoli_prot_total <- unlist(ecoli_prot) # 'unlist' takes the nested list of protein sequences from the 'ecoli_prot' data frame, and saves it as a single vector called ecoli_prot_total. If you now perform the code summary(ecoli_prot_total), you see that this vector has a length of 1326176 characters, which is the total number of nucleotides (3978528, as determined earlier for E.coli in Step 2 above) divided by 3, as expected. 
+aa <- unique(ecoli_prot_total) # this creates the list of possible amino acids to form our alphabet of possible options, to use in the 'count' code.
+aa <- aa[aa != "*"] # this removes the stop codon asterisks. 
+length(aa)
+print(aa)
+aa_composition_ecoli <- count(ecoli_prot_total, wordsize=1, alphabet=aa) # this counts the number of each nucleotide in the vector 'dna_ecoli', in combinations of 1's (ie. single nucleotides), and saves it as 'dna_composition_ecoli'. The code 'print(dna_composition_ecoli)' will show that there are 955768, 977594, 1088501, and 956665 of a, c, g, t, respectively.
+print(aa_composition_ecoli)
+```
+
+```{r}
+aa_proportion_ecoli <- aa_composition_ecoli/sum(aa_composition_ecoli)
+print(aa_proportion_ecoli)
+```
+```{r getting the amino acid composition for A.aceti}
+aaceti_prot_total <- unlist(aaceti_prot) # 'unlist' takes the nested list of protein sequences from the 'ecoli_prot' data frame, and saves it as a single vector called ecoli_prot_total. If you now perform the code summary(ecoli_prot_total), you see that this vector has a length of 1326176 characters, which is the total number of nucleotides (3978528, as determined earlier for E.coli in Step 2 above) divided by 3, as expected. 
+aa_composition_aaceti <- count(aaceti_prot_total, wordsize=1, alphabet=aa) # this counts the number of each nucleotide in the vector 'dna_ecoli', in combinations of 1's (ie. single nucleotides), and saves it as 'dna_composition_ecoli'. The code 'print(dna_composition_ecoli)' will show that there are 955768, 977594, 1088501, and 956665 of a, c, g, t, respectively.
+print(aa_composition_aaceti)
+```
+
+```{r}
+aa_proportion_aaceti <- aa_composition_aaceti/sum(aa_composition_aaceti)
+print(aa_proportion_aaceti)
+```
+
+```{r attempting to create a grouped bar chat for amino acid usage}
+#Create data frames from the aa proportions, which are currently in table format, and add the column for Organism
+aa_proportion_ecoli_df <- as.data.frame(aa_proportion_ecoli)
+aa_proportion_ecoli_df$Organism <- c("E.coli")
+aa_proportion_aaceti_df <- as.data.frame(aa_proportion_aaceti)
+aa_proportion_aaceti_df$Organism <- c("A.aceti")
+
+#Merge the two data frames together, to be one data frame
+aa_proportion_df <- rbind(aa_proportion_ecoli_df, aa_proportion_aaceti_df)
+names(aa_proportion_df) <- c("Amino_Acids", "Proportion_aa", "Organism_aa") 
+print(aa_proportion_df)
+```
+
+Making the bar graphs
+```{r bar chart for amino acid frequencies}
+#Defining the variables for the grouped bar chart
+Organism_aa <- aa_proportion_df$Organism_aa
+Amino_Acids <- aa_proportion_df$Amino_Acids
+Proportion_aa <- aa_proportion_df$Proportion_aa
+#Create the grouped bar chart
+#The code specifies the dataframe to use, and then which variables to plot where. It defines the position is side-by-side with the code 'position=position_dodge', and ensures there is a space between the columns with the code '(0.8)'. A green colour palette was chosen for the graph with the code scale_fill_brewer(palette = "Greens".
+ggbarplot(data=aa_proportion_df, x="Amino_Acids", y="Proportion_aa", fill="Organism_aa", position=position_dodge (0.8))+
+  scale_fill_brewer(palette = "Greens") 
 ```
 
 # Describe any differences between the two organisms. 
+
 
 # 5. Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
 ```{r}
