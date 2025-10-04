@@ -181,13 +181,13 @@ In order to analyse sequence data, there are two packages we need to first insta
 Seqinr is a package designed to process and analyse sequence data.
 R.utils is a package containing general utilities like zip and unzip
 
-```{r installing packages include=FALSE}
+```{r installing packages}
 #install.packages("seqinr")
 #install.packages("R.utils")
 ```
 
 
-```{r loading packages include=FALSE}
+```{r loading packages}
 suppressPackageStartupMessages({
   library("seqinr")
   library("R.utils")
@@ -322,13 +322,11 @@ names(proportion_df) <- c("Nucleotide", "Proportion", "Organism")
 print(proportion_df)
 ```
 
-```{r installl and load ggplot2 and ggpubr include=FALSE}
+```{r installl and load ggplot2 and ggpubr}
 install.packages("ggplot2")
 install.packages("ggpubr")
-suppressPackageStartupMessages({
 library("ggplot2")
 library("ggpubr")
-})
 ```
 
 Making the bar graphs
@@ -415,8 +413,30 @@ ggbarplot(data=aa_proportion_df, x="Amino_Acids", y="Proportion_aa", fill="Organ
 
 # 5. Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
 ```{r}
-
+# The RSCU stands for relative synonymous codon usage, which is a measure as to how preferred a codon of a particular amino acid is compared to the other codons which also encode it. A value of 1 indicating that the codon is used as expected. Values above 1 suggest that the codon is used more frequently than expected, while values below 1 indicate lower usage. For instance, codons like "aaa" and "att" show higher RSCU values, indicating they are used more often, whereas codons like "tga" and "tag" have lower values, suggesting less frequent use.
+codons_ecoli_df <- uco(dna_ecoli,index="rscu",as.data.frame=TRUE)
+print(codons_ecoli_df)
 ```
+
+```{r}
+str(codons_ecoli_df)
+codon_names <- codons_ecoli_df$codon
+barplot(codons_ecoli_df$RSCU, xlab="Codons", names.arg = codon_names, las=2)
+```
+
+```{r}
+test_codons_ecoli_df <- codons_ecoli_df
+test_codons_ecoli_df$"RSCU-1" <- test_codons_ecoli_df$RSCU-1
+ordered_test_codons_ecoli_df <- test_codons_ecoli_df[order(test_codons_ecoli_df$AA), ]
+ordered_test_codons_ecoli_df$"AA+codon" <- paste(ordered_test_codons_ecoli_df$AA, ":", ordered_test_codons_ecoli_df$codon)
+print(ordered_test_codons_ecoli_df)
+```
+
+```{r}
+AAcodon <- ordered_test_codons_ecoli_df$"AA+codon"
+barplot(ordered_test_codons_ecoli_df$"RSCU-1", names.arg = AAcodon, las=2)
+```
+
 
 
 # 6. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
