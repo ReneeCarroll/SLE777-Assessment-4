@@ -181,13 +181,13 @@ In order to analyse sequence data, there are two packages we need to first insta
 Seqinr is a package designed to process and analyse sequence data.
 R.utils is a package containing general utilities like zip and unzip
 
-```{r installing packages}
+```{r installing packages include=FALSE}
 #install.packages("seqinr")
 #install.packages("R.utils")
 ```
 
 
-```{r loading packages}
+```{r loading packages include=FALSE}
 suppressPackageStartupMessages({
   library("seqinr")
   library("R.utils")
@@ -280,7 +280,75 @@ text(x = 6000, y = 5e-04, labels = "A.aceti", col = "blue", cex = 1.2)
 
 ```
 
+```{r}
+dna_ecoli <- unlist(ecoli_cds) # 'unlist' takes the nested list of DNA sequences from the 'ecoli_cds' data frame, and saves it as a single vector called dna_ecoli. If you now perform the code summary(dna_ecoli), you see that this vector as a length of 3978528, which is the total number of nucleotides as determined earlier for E.coli in Step 2 above. 
+dna_composition_ecoli <- count(dna_ecoli,1) # this counts the number of each nucleotide in the vector 'dna_ecoli', in combinations of 1's (ie. single nucleotides), and saves it as 'dna_composition_ecoli'. The code 'print(dna_composition_ecoli)' will show that there are 955768, 977594, 1088501, and 956665 of a, c, g, t, respectively.
+dna_proportion_ecoli <- dna_composition_ecoli/sum(dna_composition_ecoli)
+print(dna_proportion_ecoli)
+```
+
+```{r}
+str(dna_proportion_ecoli)
+```
+
+
+```{r}
+dna_aaceti <- unlist(aaceti_cds) 
+dna_composition_aaceti <- count(dna_aaceti,1) 
+dna_proportion_aaceti <- dna_composition_aaceti/sum(dna_composition_aaceti)
+print(dna_proportion_aaceti)
+```
+
 ```{r bar plots for frequency of amino acids in the total protein sequences for both organisms}
+barplot(dna_proportion_ecoli, xlab = "Nucleotides", ylab = "Proportion", main = "E.coli coding DNA sequence composition")
+grid()
+```
+
+```{r bar plots for frequency of amino acids in the total protein sequences for both organisms}
+barplot(dna_proportion_aaceti, xlab = "Nucleotides", ylab = "Proportion", main = "A.aceti coding DNA sequence composition")
+grid()
+```
+
+```{r attempting to create a grouped bar chat, to replace the two single ones above}
+#Create data frames from the nucleotide proportions, which are currently in table format, and add the column for Organism
+dna_proportion_ecoli_df <- as.data.frame(dna_proportion_ecoli)
+dna_proportion_ecoli_df$Organism <- c("E.coli")
+dna_proportion_aaceti_df <- as.data.frame(dna_proportion_aaceti)
+dna_proportion_aaceti_df$Organism <- c("A.aceti")
+
+#Merge the two data frames together, to be one data frame
+proportion_df <- rbind(dna_proportion_ecoli_df, dna_proportion_aaceti_df)
+names(proportion_df) <- c("Nucleotide", "Proportion", "Organism") 
+print(proportion_df)
+```
+
+```{r installl and load ggplot2 and ggpubr include=FALSE}
+install.packages("ggplot2")
+install.packages("ggpubr")
+suppressPackageStartupMessages({
+library("ggplot2")
+library("ggpubr")
+})
+```
+
+Making the bar graphs
+```{r}
+#Defining the variables for the grouped bar chart
+Organism <- proportion_df$Organism
+Nucleotide <- proportion_df$Nucleotide
+Proportion <- proportion_df$Proportion
+#Create the grouped bar chart
+#The code specifies the dataframe to use, and then which variables to plot where. It defines the position is side-by-side with the code 'position=position_dodge', and ensures there is a space between the columns with the code '(0.8)'. A blue colour palette was chosen for the graph with the code scale_fill_brewer(palette = "Blues".
+ggbarplot(data=proportion_df, x="Nucleotide", y="Proportion", fill="Organism", position=position_dodge (0.8))+
+  scale_fill_brewer(palette = "Blues") 
+```
+
+
+
+
+
+
+```{r translating the coding sequences}
 
 ```
 
