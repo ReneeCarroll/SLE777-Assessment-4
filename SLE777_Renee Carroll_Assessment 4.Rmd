@@ -12,6 +12,11 @@ theme: yeti
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+suppressPackageStartupMessages(library(car))
+suppressPackageStartupMessages(library(seqinr))
+suppressPackageStartupMessages(library(R.utils))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggpubr))
 ```
 
 # Part 1
@@ -19,7 +24,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### 1.1. Read in the file, making the gene identifiers the row names. Show a table of values for the first six genes.
 
-To begin the analysis, the data file must first be read into R. 
+To begin the analysis, the RNA-seq expression data file must first be read into R. 
+
 The following code will download the required data file, and will read it into R. 
 The code instructs that the first row of data contains the column headings, and the first column is to be used as row names. 
 It also specifies that the column separation is by tabs, and that all text columns should stay as character data, and not be converted to categorical variables.
@@ -30,13 +36,13 @@ download.file(URL1, destfile="gene_expression.tsv")
 gene_expression <- read.delim("gene_expression.tsv", header = TRUE, row.names = 1, sep = "\t", stringsAsFactors = FALSE)
 ```
 
-The following table shows the expression data for the first six genes, for each of the three samples of interest.
+The gene expression data for the first six genes for each of the three samples of interest is shown in the table below.
 
-```{r}
+```{r first 6 genes}
 head(gene_expression)
 ```
 
-### 1.2. Make a new column which is the mean of the other columns. Show a table of values for the first six genes.
+#### 1.2. Make a new column which is the mean of the other columns. Show a table of values for the first six genes.
 
 A new column can easily be created using the $ code. The new column is added to the end of the data frame.
 To this new column, we can save the row mean calculation of the expression values from the three samples, for each gene.
@@ -47,7 +53,7 @@ gene_expression$mean_expression <- rowMeans(gene_expression)
 head(gene_expression)
 ```
 
-### 1.3. List the 10 genes with the highest mean expression
+#### 1.3. List the 10 genes with the highest mean expression
 
 In order to determine the highest mean expression, the data first must be put in order according to the column that contains the mean expression values.
 By including the - sign, it is ensured that the data is ordered from largest to smallest, and that is is ordering based on the column 'mean_expression'.
@@ -84,7 +90,7 @@ The 10 genes with the highest mean expression are:
 10. `r rownames(genes_highest_expression)[10]`
 
 
-### 1.4. Determine the number of genes with a mean < 10
+#### 1.4. Determine the number of genes with a mean < 10
 
 In order to determine the number of genes with mean expression <10, a subset is created from the main data frame with 'mean_expression<10' as the criteria for subsetting.
 The total number of genes in this subset can therefore be determined by retrieving the number of rows of this new subset data frame.
@@ -95,7 +101,7 @@ low_exp_genes <- subset(gene_expression, mean_expression<10)
 
 The number of genes with a mean expression <10 is `r nrow(low_exp_genes)`.
 
-### 1.5. Make a histogram plot of the mean values and include it into your report.
+#### 1.5. Make a histogram plot of the mean values and include it into your report.
 
 Histograms area useful way to visualize expression data. 
 
@@ -105,7 +111,7 @@ In this way, we can better focus on the expression data from the genes that are 
 Next, the histogram is created, with the column containing the mean expression values is selected from the appropriate data frame using the $ code.
 Additional bins are included to aid in visualising the data spread. Titles for the histogram and X axis, plus the colour, are also specified.
 
-```{r histogram of log of values}
+```{r histogram of expression values, fig.cap="Figure 1. Mean global gene expression from three samples of interest, showing severe right skewing in the data, indicating a large proportion of genes with low expression levels."}
 gene_exp_greaterthan0 <- subset(gene_expression, mean_expression>0)
 hist(gene_exp_greaterthan0$mean_expression, breaks=100, main = "Mean Gene Expression", xlab = "Mean Gene Expression", col = "dodgerblue2")
 ```
@@ -118,141 +124,173 @@ As there would be genes in this data with mean expression levels below 1, we can
 
 Here is the resulting histogram.
 
-```{r}
+```{r histogram of log mean values, fig.cap="Figure 2. Mean global gene expression from three samples of interest, on a logarithmic scale."}
 log_gene_exp_greaterthan0 <- log(gene_exp_greaterthan0+1)
 hist(log_gene_exp_greaterthan0$mean_expression, breaks=50, main = "Mean Gene Expression (log)", xlab = "Log Mean Gene Expression", col = "dodgerblue2")
 ```
 
 # Part 1
-## Tree Circumference Data
+## Tree Circumference Data Analysis
 
-The file “growth_data.csv” contains measurements for tree circumference growing at two sites, control site and treatment site which were planted 20 years ago.
+#### 1.6. Import this csv file into an R object. What are the column names?
 
-### 6. Import this csv file into an R object. What are the column names?
+The file “growth_data.csv” contains measurements for the circumferences of trees growing at two sites, a control site and a treatment site, which were planted 20 years ago.
+
+To begin the analysis, the tree circumference data file must first be read into R. 
+
+The following code will download the required data file, and will read it into R. 
+As the file is a .csv file, and as the R code read.csv() automatically treats the first row as headings, we don't need to specify additional information. 
 
 ```{r Import csv file}
 URL2 = "https://raw.githubusercontent.com/ghazkha/Assessment4/refs/heads/main/growth_data.csv"
 download.file(URL2, destfile="growth_data.csv")
-growth_data <- read.csv("growth_data.csv") # read.csv automatically treats the first row as headings, therefore you don't need to specify it in the code
+growth_data <- read.csv("growth_data.csv") # read.csv automatically treats 
 ```
 
-```{r determine column names}
-colnames(growth_data)
-```
+The column names of this data set are:
 
-### 7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
+1. `r colnames(growth_data)[1]`
 
-```{r}
+2. `r colnames(growth_data)[2]`
+
+3. `r colnames(growth_data)[3]`
+
+4. `r colnames(growth_data)[4]`
+
+5. `r colnames(growth_data)[5]`
+
+6. `r colnames(growth_data)[6]`
+
+#### 1.7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
+
+To show these important data statistics, we can create a new data frame and specify the data that should populate it.
+Here, the new data frame is called 'girth_stats_df'. The first column is given the name 'Location', and contains a character vector providing the names of the two sites.
+Columns 2 to 5 are similarly provided first with a name, then the vector of data that is to populate those columns. 
+The subset code used here requires us to specify the data frame, then the variable to subset by, which in this case is each of the locations in the Site column, followed by the column of data that's required to be copied into the new data frame, in this case, the various circumference measurements. The subset values are aggregated using the mean() or sd() function, and saved to the appropriate column. 
+
+In this way, the data frame is built with the required information. 
+
+For ease of data viewing, all values contained in columns 2 to 5 have been rounded to 2 decimal places.
+
+```{r Create new data frame for the mean and sd}
 girth_stats_df <- data.frame(
   Location = c("Northeast", "Southwest"),
-  Mean_2005 = c(mean(subset(growth_data, Site == "northeast")$Circumf_2005_cm), mean(subset(growth_data, Site == "southwest")$Circumf_2005_cm)),
-  SD_2005 = c(sd(subset(growth_data, Site == "northeast")$Circumf_2005_cm), sd(subset(growth_data, Site == "southwest")$Circumf_2005_cm)),
-  Mean_2020 = c(mean(subset(growth_data, Site == "northeast")$Circumf_2020_cm), mean(subset(growth_data, Site == "southwest")$Circumf_2020_cm)),
-  SD_2020 = c(sd(subset(growth_data, Site == "northeast")$Circumf_2020_cm), sd(subset(growth_data, Site == "southwest")$Circumf_2020_cm))
+  Mean_2005_cm = c(mean(subset(growth_data, Site == "northeast")$Circumf_2005_cm), mean(subset(growth_data, Site == "southwest")$Circumf_2005_cm)),
+  SD_2005_cm = c(sd(subset(growth_data, Site == "northeast")$Circumf_2005_cm), sd(subset(growth_data, Site == "southwest")$Circumf_2005_cm)),
+  Mean_2020_cm = c(mean(subset(growth_data, Site == "northeast")$Circumf_2020_cm), mean(subset(growth_data, Site == "southwest")$Circumf_2020_cm)),
+  SD_2020_cm = c(sd(subset(growth_data, Site == "northeast")$Circumf_2020_cm), sd(subset(growth_data, Site == "southwest")$Circumf_2020_cm))
 )
+girth_stats_df[,2:5] <- round(girth_stats_df[,2:5], digits = 2)
+```
+
+The following table shows the mean and standard deviation of tree circumference at the start and end of the study at both sites
+
+``` {r Print the new data frame of mean and sd}
 print(girth_stats_df)
 ```
 
-### 8. Make a box plot of tree circumference at the start and end of the study at both sites.
+#### 1.8. Make a box plot of tree circumference at the start and end of the study at both sites.
 
-```{r boxplot of tree circumference at the start and end of the study at both sites}
+To create the boxplot, we'll again use the subset code to select the data we want plotted in the boxplot, from the original growth data frame. 
+
+```{r boxplot of tree circumference at the start and end of the study at both sites, fig.cap="Figure 3. Boxplot of tree girth measurements (in cm) taken in 2005 and 2020 at the Norheast and Southwest study sites. The median value is shown by the black horizontal central line. The interquartile range, comprised of the upper quartile above the median, and the lower quartile below the median, is represented by the coloured box. The maximum and minimum values are shown by the ends of the whiskers"}
 boxplot(
   subset(growth_data, Site == "northeast")$Circumf_2005_cm, 
   subset(growth_data, Site == "northeast")$Circumf_2020_cm, 
   subset(growth_data, Site == "southwest")$Circumf_2005_cm, 
   subset(growth_data, Site == "southwest")$Circumf_2020_cm, 
   names = c("Northeast 2005", "Northeast 2020", "Southwest 2005", "Southwest 2020"), 
+  col = c("forestgreen"),
   ylab = "Circumference (cm)", 
   main = "Increase in tree girth between 2005 and 2020, at each study site")
 ```
 
-### 9. Calculate the mean growth over the last 10 years at each site.
+#### 1.9. Calculate the mean growth over the last 10 years at each site.
 
-```{r mean growth over the last 10 years, northeast site}
-# Add a column to the existing dataframe, to contain the calculation of 2020 measurements minus the 2010 measurements.
+To calculate and display the mean growth from 2010 to 2020, use the $ code to add a column to the original data frame to contain this information. 
+To this column, assign the difference in circumference measurements from 2010 to 2020.
+Next, create a new data frame, and save into this the site names, and the calculated mean of the difference in measurements from the main data frame, using the subset() code to select the appropriate data as per each location. Including the code 'check.names=FALSE' ensures that the column names appear as intended.
+
+```{r mean growth over the last 10 years}
+# Add a column to the existing data frame, to contain the calculation of 2020 measurements minus the 2010 measurements.
 growth_data$growth_2010_2020 <- growth_data$Circumf_2020_cm-growth_data$Circumf_2010_cm 
 
 # Create a new data frame to present the mean of the 10 year growth data, for each location.
 mean_10yr_growth_df <- data.frame(
   Location = c("Northeast", "Southwest"),
-  "Mean 10yr growth" = c(mean(subset(growth_data, Site == "northeast")$growth_2010_2020), mean(subset(growth_data, Site == "southwest")$growth_2010_2020))
+  "Mean 10 year growth (cm)" = c(mean(subset(growth_data, Site == "northeast")$growth_2010_2020), mean(subset(growth_data, Site == "southwest")$growth_2010_2020)),
+  check.names = FALSE 
 )
+```
+
+Here is the mean growth, measured in cm, over the last 10 years at each of the sites.
+
+```{r table showing mean growth over 10 years}
 print(mean_10yr_growth_df)
 ```
 
-### 10. Use the t.test to estimate the p-value that the 10 year growth is different at the two sites.
-The t.test() function returns an object containing various information, including:
-t-statistic: The calculated t-value.
-df: Degrees of freedom.
-p-value: The probability of observing a t-statistic as extreme as, or more extreme than, the calculated one, assuming the null hypothesis is true. A small p-value (typically < 0.05) suggests evidence against the null hypothesis.
-confidence interval: A range within which the true population mean difference (for two-sample tests) or population mean (for one-sample tests) is likely to fall.
-sample means: The means of the groups or sample.
+#### 1.10. Use the t.test to estimate the p-value that the 10 year growth is different at the two sites.
 
-Assumptions:
-T-tests rely on assumptions like normality of data (or residuals for two-sample tests) and, for independent samples, potentially equality of variances. You may need to check these assumptions before interpreting the results.
+Prior to conducting a t-test, it is important to fist check for equal variance in the data.
+Equal variance can be calculated using leveneTest() code as part of the "car" package.
 
-```{r test for normality in the northeast data}
-hist(subset(growth_data, Site == "northeast")$growth_2010_2020, breaks = 20)
+``` {r}
+#install.packages("car")
+library(car)
+leveneTest(growth_2010_2020 ~ Site, data = growth_data)
 ```
+As the Levene's Test returned a P-value of 0.006116, it indicates the variances in this data are not equal, and therefore the appropriate t-test to use is a Welch's t-test, as it adjusts for unequal variances.
 
-```{r test for normality in the southwest data}
-hist(subset(growth_data, Site == "southwest")$growth_2010_2020, breaks = 20)
-```
+The output for Welch's t-test is below:
 
+```{r t.test)}
+t.test(growth_2010_2020 ~ Site, data = growth_data, var.equal = FALSE) # var.equal = FALSE isn't required here, as it is the default for t.test() in R.
+```
+This t-test provided a p-value of 0.06229, indicating the difference in 10 year growth between the two sites is not statistically significant, however as this value is only slightly above the cutoff of 0.05, is is close to being significant.
 
-```{r t.test, not assuming equal variance (Welch t.test)}
-t.test(growth_2010_2020 ~ Site, data = growth_data, var.equal = FALSE) #var.equal = TRUE: Include this if you assume equal variances between the groups (for a Student's t-test). Omit or set to FALSE for Welch's t-test (which doesn't assume equal variances).
-```
-```{r t.test, assuming equal variance}
-t.test(growth_2010_2020 ~ Site, data = growth_data, var.equal = TRUE) #var.equal = TRUE: Include this if you assume equal variances between the groups (for a Student's t-test). Omit or set to FALSE for Welch's t-test (which doesn't assume equal variances).
-```
+The recommendation is to keep monitoring tree growth at the two sites, and repeat the analysis in the future.
+
 
 # Part 2
 ## Examining biological sequence diversity between E.coli and A.aceti
 
-In order to analyse sequence data, there are two packages we need to first install and load.
+Here in this report, we will perform a comparative analysis on the coding sequences of two bacteria, Escherichia coli (E.coli) and Acetobacter aceti (A.aceti).
 
+First, install and load two required packages, Seqinr and R.utils. 
 Seqinr is a package designed to process and analyse sequence data.
-R.utils is a package containing general utilities like zip and unzip
+R.utils is a general utilities package, which will be used here to unzip files.
 
-```{r installing packages}
+```{r install and load packages}
 #install.packages("seqinr")
 #install.packages("R.utils")
+library("seqinr")
+library("R.utils")
 ```
 
+#### 2.1.1. Download the whole set of coding DNA sequences for E. coli and your organism of interest.
 
-```{r loading packages}
-suppressPackageStartupMessages({
-  library("seqinr")
-  library("R.utils")
-})
-```
+The coding DNA sequence files (cds files) can be downloaded from Ensembl's database, using the respective URL. 
+Once downloaded and saved, the FASTA file can then be unzipped using the gunzip() code from the "R.utils" package.
 
-### 1. Download the whole set of coding DNA sequences for E. coli and your organism of interest. How many coding sequences are present in these organisms? Present this in the form of a table. Describe any differences between the two organisms. 
+Both FASTA files are read into R using the read.fasta() code as part of the "seqinr" package.
 
-```{r Download E.coli genome}
+```{r Download E.coli coding DNA sequences}
+# Download the E.coli cds, and unzip the file.
 #URL3 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
 #download.file(URL3, destfile="ecoli_cds.fa.gz")
 #gunzip("ecoli_cds.fa.gz")
-```
 
-```{r Download organism of interest, Acetobacter aceti GCA_002005445}
+# Download the cds for my organism of interest, Acetobacter aceti GCA_002005445, and unzip the file.
 #URL4 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_80_collection/acetobacter_aceti_gca_002005445/cds/Acetobacter_aceti_gca_002005445.ASM200544v1.cds.all.fa.gz"
 #download.file(URL4, destfile="aaceti_cds.fa.gz")
 #gunzip("aaceti_cds.fa.gz")
-```
-```{r reading in the two sequence data files}
+
+# Read in the two sequence files.
 ecoli_cds <- seqinr::read.fasta("ecoli_cds.fa")
 aaceti_cds <- seqinr::read.fasta("aaceti_cds.fa")
 ```
 
-```{r}
-str(head(ecoli_cds))
-```
-
-```{r}
-str(head(aaceti_cds))
-```
+#### 2.1.2. How many coding sequences are present in these organisms? Present this in the form of a table. 
 
 ```{r Table of the number of coding sequences present in these organisms}
 cds_df <- data.frame(
@@ -263,14 +301,17 @@ cds_df <- data.frame(
 print(cds_df)
 ```
 
-### Describe any differences between the two organisms. 
+#### 2.1.3. Describe any differences between the two organisms. 
+
+
 ```{r percentage increase in number of coding sequences}
 percentage_increase <- (length(ecoli_cds)-length(aaceti_cds))/length(aaceti_cds)*100
 print(percentage_increase)
 ```
+
 The organism E.coli contains 24.6% more genes than the organism A.aceti, suggesting E.coli is a more complex organism.
 
-### 2. How much coding DNA is there in total for these two organisms? Present this in the form of a table. Describe any differences between the two organisms.
+#### 2. How much coding DNA is there in total for these two organisms? Present this in the form of a table. Describe any differences between the two organisms.
 ```{r Table of the total amount of coding DNA for the two organisms}
 length_ecoli_genes <- as.numeric(summary(ecoli_cds)[,1])
 length_aaceti_genes <- as.numeric(summary(aaceti_cds)[,1])
