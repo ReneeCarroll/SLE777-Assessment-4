@@ -5,8 +5,6 @@ date: "2025-09-25"
 output: 
   html_document:
     toc: yes
-    fig_width: 7
-    fig_height: 7
 theme: yeti
 ---
 
@@ -15,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Part 1
+## Gene Expression Data
+
 The file “gene_expression.tsv” contains RNA-seq count data for three samples of interest.
 
 # 1. Read in the file, making the gene identifiers the row names. Show a table of values for the first six genes.
@@ -56,28 +56,25 @@ nrow(low_exp_genes)
 
 # 5. Make a histogram plot of the mean values and include it into your report.
 
-```{r histogram}
+```{r histogram, fig_width: 7, fig_height: 7}
 hist(gene_expression$mean_expression, breaks=1000, main = "Mean Gene Expression", xlab="Mean Gene Expression", col="dodgerblue2")
 ```
 
 As the data is highly positively skewed, it is best represented on a logarithmic scale.
 
+```{r}
+log_gene_expression <- log(gene_expression+1) # Add 1 to each data point, to account for zeros in the dataset, as you cant take a log of zero.
+hist(log_gene_expression$mean_expression, breaks=50, main = "Mean Gene Expression", xlab="Log Mean Gene Expression", col="dodgerblue2")
+```
+As the graph is still highly skewed, lets remove lowly expressed genes with mean expression less than 10.
 
 ```{r histogram of log of values}
 gene_subset_expressionhigherthan10 <- subset(gene_expression, mean_expression>10)
 log_gene_subset_expressionhigherthan10 <- log(gene_subset_expressionhigherthan10)
 hist(log_gene_subset_expressionhigherthan10$mean_expression, breaks=50, main = "Mean Gene Expression", xlab = "Log Mean Gene Expression", col = "dodgerblue2")
 ```
-
-Try that again, using log+1, as log of 0 gives infinity... does this make a difference to how the graph looks?
-
-
-```{r histogram of log of values+1}
-gene_subset_expressionhigherthan10 <- subset(gene_expression, mean_expression>10)
-log_gene_subset_expressionhigherthan10 <- log(gene_subset_expressionhigherthan10+1)
-hist(log_gene_subset_expressionhigherthan10$mean_expression, breaks=50, main = "Mean Gene Expression", xlab = "Log Mean Gene Expression", col = "dodgerblue2")
-```
-
+## Part 1
+## Tree Circumference Data
 
 The file “growth_data.csv” contains measurements for tree circumference growing at two sites, control site and treatment site which were planted 20 years ago.
 
@@ -93,58 +90,44 @@ growth_data <- read.csv("growth_data.csv") # read.csv automatically treats the f
 colnames(growth_data)
 ```
 
-
-
-
-
 # 7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
 
-```{r northeast site, mean of tree circumferences, start of study}
-mean(subset(growth_data, Site == "northeast")$Circumf_2005_cm)
-```
-
-```{r northeast site, standard deviation of tree circumferences, start of study}
-sd(subset(growth_data, Site == "northeast")$Circumf_2005_cm)
-```
-
-```{r northeast site, mean of tree circumferences, end of study}
-mean(subset(growth_data, Site == "northeast")$Circumf_2020_cm)
-```
-
-```{r northeast site, standard deviation of tree circumferences, end of study}
-sd(subset(growth_data, Site == "northeast")$Circumf_2020_cm)
-```
-
-```{r southwest site, mean of tree circumferences, start of study}
-mean(subset(growth_data, Site == "southwest")$Circumf_2005_cm)
-```
-
-```{r southwest site, standard deviation of tree circumferences, start of study}
-sd(subset(growth_data, Site == "southwest")$Circumf_2005_cm)
-```
-
-```{r southwest site, mean of tree circumferences, end of study}
-mean(subset(growth_data, Site == "southwest")$Circumf_2020_cm)
-```
-
-```{r southwest site, standard deviation of tree circumferences, end of study}
-sd(subset(growth_data, Site == "southwest")$Circumf_2020_cm)
+```{r}
+girth_stats_df <- data.frame(
+  Location = c("Northeast", "Southwest"),
+  Mean_2005 = c(mean(subset(growth_data, Site == "northeast")$Circumf_2005_cm), mean(subset(growth_data, Site == "southwest")$Circumf_2005_cm)),
+  SD_2005 = c(sd(subset(growth_data, Site == "northeast")$Circumf_2005_cm), sd(subset(growth_data, Site == "southwest")$Circumf_2005_cm)),
+  Mean_2020 = c(mean(subset(growth_data, Site == "northeast")$Circumf_2020_cm), mean(subset(growth_data, Site == "southwest")$Circumf_2020_cm)),
+  SD_2020 = c(sd(subset(growth_data, Site == "northeast")$Circumf_2020_cm), sd(subset(growth_data, Site == "southwest")$Circumf_2020_cm))
+)
+print(girth_stats_df)
 ```
 
 # 8. Make a box plot of tree circumference at the start and end of the study at both sites.
 
 ```{r boxplot of tree circumference at the start and end of the study at both sites}
-boxplot(subset(growth_data, Site == "northeast")$Circumf_2005_cm, subset(growth_data, Site == "northeast")$Circumf_2020_cm, subset(growth_data, Site == "southwest")$Circumf_2005_cm, subset(growth_data, Site == "southwest")$Circumf_2020_cm, names = c("Northeast 2005", "Northeast 2020", "Southwest 2005", "Southwest 2020"), ylab = "Circumference (cm)", main = "Increase in tree girth between 2005 and 2020, at each study site")
+boxplot(
+  subset(growth_data, Site == "northeast")$Circumf_2005_cm, 
+  subset(growth_data, Site == "northeast")$Circumf_2020_cm, 
+  subset(growth_data, Site == "southwest")$Circumf_2005_cm, 
+  subset(growth_data, Site == "southwest")$Circumf_2020_cm, 
+  names = c("Northeast 2005", "Northeast 2020", "Southwest 2005", "Southwest 2020"), 
+  ylab = "Circumference (cm)", 
+  main = "Increase in tree girth between 2005 and 2020, at each study site")
 ```
 
 # 9. Calculate the mean growth over the last 10 years at each site.
 
 ```{r mean growth over the last 10 years, northeast site}
-growth_data$growth_2010_2020 <- growth_data$Circumf_2020_cm-growth_data$Circumf_2010_cm
-mean(subset(growth_data, Site == "northeast")$growth_2010_2020)
-```
-```{r mean growth over the last 10 years, southwest site}
-mean(subset(growth_data, Site == "southwest")$growth_2010_2020)
+# Add a column to the existing dataframe, to contain the calculation of 2020 measurements minus the 2010 measurements.
+growth_data$growth_2010_2020 <- growth_data$Circumf_2020_cm-growth_data$Circumf_2010_cm 
+
+# Create a new data frame to present the mean of the 10 year growth data, for each location.
+mean_10yr_growth_df <- data.frame(
+  Location = c("Northeast", "Southwest"),
+  "Mean 10yr growth" = c(mean(subset(growth_data, Site == "northeast")$growth_2010_2020), mean(subset(growth_data, Site == "southwest")$growth_2010_2020))
+)
+print(mean_10yr_growth_df)
 ```
 
 # 10. Use the t.test to estimate the p-value that the 10 year growth is different at the two sites.
@@ -220,14 +203,15 @@ str(head(ecoli_cds))
 str(head(aaceti_cds))
 ```
 
-
-
 ```{r Table of the number of coding sequences present in these organisms}
-install.packages("data.table")
-library(data.table)
-cds_table_number <- data.table(Organism = c("E.coli", "A.aceti"), "Number of Coding Sequences" = c(length(ecoli_cds), length(aaceti_cds)))
-print(cds_table_number)
+cds_df <- data.frame(
+  Organism = c("E.coli", "A.aceti"),
+  "Number of Coding Sequences" = c(length(ecoli_cds), length(aaceti_cds)),
+  check.names = FALSE 
+  )
+print(cds_df)
 ```
+
 # Describe any differences between the two organisms. 
 ```{r percentage increase in number of coding sequences}
 percentage_increase <- (length(ecoli_cds)-length(aaceti_cds))/length(aaceti_cds)*100
@@ -239,8 +223,12 @@ The organism E.coli contains 24.6% more genes than the organism A.aceti, suggest
 ```{r Table of the total amount of coding DNA for the two organisms}
 length_ecoli_genes <- as.numeric(summary(ecoli_cds)[,1])
 length_aaceti_genes <- as.numeric(summary(aaceti_cds)[,1])
-cds_table_total <- data.table(Organism = c("E.coli", "A.aceti"), "Total Amount of Coding Sequence" = c(sum(length_ecoli_genes), sum(length_aaceti_genes)))
-print(cds_table_total)
+cds_total_df <- data.frame(
+  Organism = c("E.coli", "A.aceti"), 
+  "Total Amount of Coding Sequence" = c(sum(length_ecoli_genes), sum(length_aaceti_genes)),
+  check.names = FALSE 
+) # Including the check.names = FALSE code so that R doesn't add '.' in between the words of the Column names.
+print(cds_total_df)
 ```
 # Describe any differences between the two organisms. 
 ```{r percentage increase in total amount of coding sequences}
@@ -254,62 +242,139 @@ In line with a 24.6% increase in genes, E.coli contains a proportional increase 
 ```{r Boxplot of coding sequence length in these organisms}
 boxplot(length_ecoli_genes, length_aaceti_genes, names = c("E.coli", "A.aceti"), main = "Coding DNA Sequence Length in E.coli and A.aceti", ylab="Length (bp)")
 ```
-
-```{r Mean and median coding sequence length in these organisms}
-cds_table_stats <- data.table(Organism = c("E.coli", "A.aceti"), "Mean cDNA Sequence Length" = c(mean(length_ecoli_genes), mean(length_aaceti_genes)), "Median cDNA Sequence Length" = c(median(length_ecoli_genes), median(length_aaceti_genes)))
-print(cds_table_stats)
+```{r Boxplot of log coding sequence length in these organisms}
+boxplot(log(length_ecoli_genes), log(length_aaceti_genes), names = c("E.coli", "A.aceti"), main = "Coding DNA Sequence Length in E.coli and A.aceti", ylab="Log of Length (bp)")
 ```
-
-# Describe any differences between the two organisms. 
-
-
-```{r}
+```{r Density plot to explore coding cDNA lengths between species}
+# Create the vectors of the coding sequences
 d_ecoli <- density(length_ecoli_genes)
 d_aaceti <- density(length_aaceti_genes)
+
+# Create the density plot
 plot(d_ecoli, col="red", main = "Density plot of coding DNA sequence lengths", xlab = "cDNA length")
 lines(d_aaceti, col="blue")
+
+# Add custom tick marks
+axis(1, at = seq(0, max(length_ecoli_genes, length_aaceti_genes), by = 1000))
+
+# Add names for each line
 text(x = 6000, y = 6e-04, labels = "E.coli", col = "red", cex = 1.2)
 text(x = 6000, y = 5e-04, labels = "A.aceti", col = "blue", cex = 1.2)
 ```
 
 
+```{r Mean and median coding sequence length in these organisms}
+cds_stats_df <- data.frame(
+  Organism = c("E.coli", "A.aceti"),
+  "Mean cDNA Sequence Length" = c(mean(length_ecoli_genes), mean(length_aaceti_genes)),
+  "Median cDNA Sequence Length" = c(median(length_ecoli_genes), median(length_aaceti_genes)),
+  check.names = FALSE 
+)
+print(cds_stats_df)
+```
+
+# Describe any differences between the two organisms. 
+
+
+
+
 
 
 # 4. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
-```{r bar plots for frequency of DNA bases in the total coding sequences for both organisms}
 
-```
+```{r Nucleotide composition of E.coli}
+# Unlist the DNA sequences from the 'ecoli_cds' data frame, save the sequences as a single vector called 'dna_ecoli'
+dna_ecoli <- unlist(ecoli_cds) 
 
-```{r}
-dna_ecoli <- unlist(ecoli_cds) # 'unlist' takes the nested list of DNA sequences from the 'ecoli_cds' data frame, and saves it as a single vector called dna_ecoli. If you now perform the code summary(dna_ecoli), you see that this vector as a length of 3978528, which is the total number of nucleotides as determined earlier for E.coli in Step 2 above. 
-dna_composition_ecoli <- count(dna_ecoli,1) # this counts the number of each nucleotide in the vector 'dna_ecoli', in combinations of 1's (ie. single nucleotides), and saves it as 'dna_composition_ecoli'. The code 'print(dna_composition_ecoli)' will show that there are 955768, 977594, 1088501, and 956665 of a, c, g, t, respectively.
+# Perform this code to confirm this vectors length is the same as the total number of nucleotides as determined earlier for E.coli in Step 2 above, ie 3978528. 
+summary(dna_ecoli)
+
+# Count the number of each nucleotide in the vector 'dna_ecoli', in combinations of 1's (ie. single nucleotides), save the sequences as a single vector called 'dna_composition_ecoli'
+dna_composition_ecoli <- count(dna_ecoli,1)
+
+# This will show the total number of each base in E.coli's coding sequence.
+print(dna_composition_ecoli)
+
+# Calculate the proportion of each nucleotide
 dna_proportion_ecoli <- dna_composition_ecoli/sum(dna_composition_ecoli)
+dna_proportion_ecoli <- round(dna_proportion_ecoli, digits = 3)
 print(dna_proportion_ecoli)
 ```
 
-```{r}
-str(dna_proportion_ecoli)
-```
-
-
-```{r}
+```{r Nucleotide composition of A.aceti}
+# As per the code for E.coli, now do the same for A.aceti
 dna_aaceti <- unlist(aaceti_cds) 
+summary(dna_aaceti)
 dna_composition_aaceti <- count(dna_aaceti,1) 
+print(dna_composition_aaceti)
 dna_proportion_aaceti <- dna_composition_aaceti/sum(dna_composition_aaceti)
+dna_proportion_aaceti <- round(dna_proportion_aaceti, digits = 3)
 print(dna_proportion_aaceti)
 ```
+```{r translating the coding sequences}
+# Translate the cDNA from E.coli. The lapply function performs a loop, applying the 'translate' code to all elements of the 'ecoli_cds' data, and saving the protein sequences to the 'ecoli_prot' object.
+ecoli_prot <- lapply(ecoli_cds, translate)
 
-```{r bar plots for frequency of amino acids in the total protein sequences for both organisms}
-barplot(dna_proportion_ecoli, xlab = "Nucleotides", ylab = "Proportion", main = "E.coli coding DNA sequence composition")
-grid()
+#translate the cDNA from A.aceti
+aaceti_prot <- lapply(aaceti_cds, translate)
 ```
 
-```{r bar plots for frequency of amino acids in the total protein sequences for both organisms}
-barplot(dna_proportion_aaceti, xlab = "Nucleotides", ylab = "Proportion", main = "A.aceti coding DNA sequence composition")
-grid()
+```{r}
+head(ecoli_prot)
 ```
 
-```{r attempting to create a grouped bar chat, to replace the two single ones above}
+you see that this vector has a length of 1326176 characters, which is the total number of nucleotides (3978528, as determined earlier for E.coli in Step 2 above) divided by 3, as expected. 
+
+```{r Determining the amino acid composition of E.coli proteome}
+# Unlist the protein sequences from the 'ecoli_prot' data frame, saves the sequences as a single vector called 'ecoli_prot_total'
+ecoli_prot_total <- unlist(ecoli_prot)
+
+# Show the summary of the new vector, ecoli_prot_total, to see the total number of characters. This should be the total number of coding nucleotides divided by 3.
+summary(ecoli_prot_total)
+
+# Creates the list of possible amino acids to form our alphabet to use in the 'count' code.
+aa <- unique(ecoli_prot_total) 
+
+# Removes the stop codon asterisks.
+aa <- aa[aa != "*"] 
+
+# Confirm there are 20 amino acids, and what their identifyers are
+length(aa)
+print(aa)
+
+# this counts the number of each amino acids in the vector 'aa_composition_ecoli', in combinations of 1's (ie. single amino acids), using the aa alphabet we just determined, and saves it as the vector 'aa_composition_ecoli'. 
+aa_composition_ecoli <- count(ecoli_prot_total, wordsize=1, alphabet=aa) 
+
+# Show the composition of amino acids in the E.coli proteome
+print(aa_composition_ecoli)
+
+# Calculate, then show, the proportion of each amino acid in the E.coli proteome
+aa_proportion_ecoli <- aa_composition_ecoli/sum(aa_composition_ecoli)
+aa_proportion_ecoli <- round(aa_proportion_ecoli, digits = 3)
+print(aa_proportion_ecoli)
+```
+
+```{r Determining the amino acid composition of A.aceti proteome}
+# Follow the same code as outlined above for E.Coli
+aaceti_prot_total <- unlist(aaceti_prot) 
+summary(aaceti_prot_total)
+
+aa_composition_aaceti <- count(aaceti_prot_total, wordsize=1, alphabet=aa)
+print(aa_composition_aaceti)
+
+aa_proportion_aaceti <- aa_composition_aaceti/sum(aa_composition_aaceti)
+aa_proportion_aaceti <- round(aa_proportion_aaceti, digits = 3)
+print(aa_proportion_aaceti)
+```
+
+```{r Installing and loading ggplot2 and ggpubr for creating graphs}
+install.packages("ggplot2")
+install.packages("ggpubr")
+library("ggplot2")
+library("ggpubr")
+```
+
+```{r Grouped bar chat showing nucleotide useage in E.coli and A.aceti}
 #Create data frames from the nucleotide proportions, which are currently in table format, and add the column for Organism
 dna_proportion_ecoli_df <- as.data.frame(dna_proportion_ecoli)
 dna_proportion_ecoli_df$Organism <- c("E.coli")
@@ -322,19 +387,13 @@ names(proportion_df) <- c("Nucleotide", "Proportion", "Organism")
 print(proportion_df)
 ```
 
-```{r installl and load ggplot2 and ggpubr}
-install.packages("ggplot2")
-install.packages("ggpubr")
-library("ggplot2")
-library("ggpubr")
-```
-
 Making the bar graphs
-```{r bar chart for nucleotide frequencies}
+```{r Bar chart for nucleotide frequencies}
 #Defining the variables for the grouped bar chart
 Organism <- proportion_df$Organism
 Nucleotide <- proportion_df$Nucleotide
 Proportion <- proportion_df$Proportion
+
 #Create the grouped bar chart
 #The code specifies the dataframe to use, and then which variables to plot where. It defines the position is side-by-side with the code 'position=position_dodge', and ensures there is a space between the columns with the code '(0.8)'. A blue colour palette was chosen for the graph with the code scale_fill_brewer(palette = "Blues".
 ggbarplot(data=proportion_df, x="Nucleotide", y="Proportion", fill="Organism", position=position_dodge (0.8))+
@@ -342,48 +401,7 @@ ggbarplot(data=proportion_df, x="Nucleotide", y="Proportion", fill="Organism", p
 ```
 
 
-
-
-
-
-```{r translating the coding sequences}
-#translate the cDNA from E.coli
-#the lapply function performs a loop, applying the 'translate' code to all elements of the 'ecoli_cds' data, and saving the protein sequences to the 'ecoli_prot' object.
-ecoli_prot <- lapply(ecoli_cds, translate)
-#translate the cDNA from A.aceti
-aaceti_prot <- lapply(aaceti_cds, translate)
-```
-
-```{r}
-head(ecoli_prot)
-```
-
-```{r}
-ecoli_prot_total <- unlist(ecoli_prot) # 'unlist' takes the nested list of protein sequences from the 'ecoli_prot' data frame, and saves it as a single vector called ecoli_prot_total. If you now perform the code summary(ecoli_prot_total), you see that this vector has a length of 1326176 characters, which is the total number of nucleotides (3978528, as determined earlier for E.coli in Step 2 above) divided by 3, as expected. 
-aa <- unique(ecoli_prot_total) # this creates the list of possible amino acids to form our alphabet of possible options, to use in the 'count' code.
-aa <- aa[aa != "*"] # this removes the stop codon asterisks. 
-length(aa)
-print(aa)
-aa_composition_ecoli <- count(ecoli_prot_total, wordsize=1, alphabet=aa) # this counts the number of each nucleotide in the vector 'dna_ecoli', in combinations of 1's (ie. single nucleotides), and saves it as 'dna_composition_ecoli'. The code 'print(dna_composition_ecoli)' will show that there are 955768, 977594, 1088501, and 956665 of a, c, g, t, respectively.
-print(aa_composition_ecoli)
-```
-
-```{r}
-aa_proportion_ecoli <- aa_composition_ecoli/sum(aa_composition_ecoli)
-print(aa_proportion_ecoli)
-```
-```{r getting the amino acid composition for A.aceti}
-aaceti_prot_total <- unlist(aaceti_prot) # 'unlist' takes the nested list of protein sequences from the 'ecoli_prot' data frame, and saves it as a single vector called ecoli_prot_total. If you now perform the code summary(ecoli_prot_total), you see that this vector has a length of 1326176 characters, which is the total number of nucleotides (3978528, as determined earlier for E.coli in Step 2 above) divided by 3, as expected. 
-aa_composition_aaceti <- count(aaceti_prot_total, wordsize=1, alphabet=aa) # this counts the number of each nucleotide in the vector 'dna_ecoli', in combinations of 1's (ie. single nucleotides), and saves it as 'dna_composition_ecoli'. The code 'print(dna_composition_ecoli)' will show that there are 955768, 977594, 1088501, and 956665 of a, c, g, t, respectively.
-print(aa_composition_aaceti)
-```
-
-```{r}
-aa_proportion_aaceti <- aa_composition_aaceti/sum(aa_composition_aaceti)
-print(aa_proportion_aaceti)
-```
-
-```{r attempting to create a grouped bar chat for amino acid usage}
+```{r Bar chat for amino acid frequencies}
 #Create data frames from the aa proportions, which are currently in table format, and add the column for Organism
 aa_proportion_ecoli_df <- as.data.frame(aa_proportion_ecoli)
 aa_proportion_ecoli_df$Organism <- c("E.coli")
@@ -402,6 +420,7 @@ Making the bar graphs
 Organism_aa <- aa_proportion_df$Organism_aa
 Amino_Acids <- aa_proportion_df$Amino_Acids
 Proportion_aa <- aa_proportion_df$Proportion_aa
+
 #Create the grouped bar chart
 #The code specifies the dataframe to use, and then which variables to plot where. It defines the position is side-by-side with the code 'position=position_dodge', and ensures there is a space between the columns with the code '(0.8)'. A green colour palette was chosen for the graph with the code scale_fill_brewer(palette = "Greens".
 ggbarplot(data=aa_proportion_df, x="Amino_Acids", y="Proportion_aa", fill="Organism_aa", position=position_dodge (0.8))+
@@ -412,30 +431,61 @@ ggbarplot(data=aa_proportion_df, x="Amino_Acids", y="Proportion_aa", fill="Organ
 
 
 # 5. Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
-```{r}
-# The RSCU stands for relative synonymous codon usage, which is a measure as to how preferred a codon of a particular amino acid is compared to the other codons which also encode it. A value of 1 indicating that the codon is used as expected. Values above 1 suggest that the codon is used more frequently than expected, while values below 1 indicate lower usage. For instance, codons like "aaa" and "att" show higher RSCU values, indicating they are used more often, whereas codons like "tga" and "tag" have lower values, suggesting less frequent use.
+
+The RSCU stands for relative synonymous codon usage, which is a measure as to how preferred a codon of a particular amino acid is compared to the other codons which also encode it. A value of 1 indicating that the codon is used as expected. Values above 1 suggest that the codon is used more frequently than expected, while values below 1 indicate lower usage. For instance, codons like "aaa" and "att" show higher RSCU values, indicating they are used more often, whereas codons like "tga" and "tag" have lower values, suggesting less frequent use.
+
+```{r Creating the codon usage table FIRST ATTEMPT, BUT THE ROWS ARE JUST ADDED TO EACH OTHER. SHOULD I HAVE INSTEAD ADDED JUST THE COLUMN DATA?}
+# Create the codon usage data frame for E.coli, showing RSCU values. 
 codons_ecoli_df <- uco(dna_ecoli,index="rscu",as.data.frame=TRUE)
 print(codons_ecoli_df)
+
+# Create the codon usage data frame for A.aceti, showing RSCU values
+codons_aaceti_df <- uco(dna_aaceti,index="rscu",as.data.frame=TRUE)
+print(codons_aaceti_df)
 ```
 
-```{r}
-str(codons_ecoli_df)
-codon_names <- codons_ecoli_df$codon
-barplot(codons_ecoli_df$RSCU, xlab="Codons", names.arg = codon_names, las=2)
+#### IF I HAVE TIME IT WOULD BE GOOD TO PUT THIS IN ONE TABLE, THOUGH IM NOT SURE IF THAT ONE TABLE WOULD BE EASY TO GRAPH TOGETHER OR NOT.
+```{r ATTEMPT TO ADD THESE INTO ONE TABLE}
+# Set the column names to include which organism it is
+
+# OR CREATE A NEW DATAFRAME, WITH SELECTED FEATURES OF THE OTHER TWO, TO MAKE A DATAFRAME THAT HAS JUST THE AA, CODON, AND RSCU VALUE.
+
+# Merge the rows required
 ```
 
-```{r}
-test_codons_ecoli_df <- codons_ecoli_df
-test_codons_ecoli_df$"RSCU-1" <- test_codons_ecoli_df$RSCU-1
-ordered_test_codons_ecoli_df <- test_codons_ecoli_df[order(test_codons_ecoli_df$AA), ]
-ordered_test_codons_ecoli_df$"AA+codon" <- paste(ordered_test_codons_ecoli_df$AA, ":", ordered_test_codons_ecoli_df$codon)
-print(ordered_test_codons_ecoli_df)
+```{r Grouped bar chart for RSCU values, minus 1}
+# Add a column for organism name
+codons_ecoli_df$Organism <- c("E.coli")
+
+# Add a column for organism name
+codons_aaceti_df$Organism <- c("A.aceti")
+
+# Merge these dataframes into one
+column_names <- colnames(codons_ecoli_df)
+codons_df <- rbind(codons_ecoli_df, codons_aaceti_df)
+names(codons_df) <- column_names
+print(codons_df)
+
+# Create a new column that calculates the RSCU value minus 1, such that values are either above or below a zero line.
+codons_df$"RSCU-1" <- codons_df$RSCU-1
+
+# Create a new column that contains the amino acid name plus it's codon
+codons_df$"AA_and_codon" <- paste(codons_df$AA, ":", codons_df$codon)
+
+# Put the data in alphabetical order, according to the amino acid 3 letter code, and print the resulting table
+ordered_codons_df <- codons_df[order(codons_df$AA), ]
+print(ordered_codons_df)
 ```
 
-```{r}
-AAcodon <- ordered_test_codons_ecoli_df$"AA+codon"
-barplot(ordered_test_codons_ecoli_df$"RSCU-1", names.arg = AAcodon, las=2)
+```{r Grouped barplot showing RSCU-1 values for E.coli and A.aceti}
+# In the theme() component, I've set the column text size to 7, have adjusted the angle to 90 degrees,have justified the lables to be straight against the x-axis, and have shifted them left such that they line up under the tick lines. 
+ggbarplot(data=ordered_codons_df, x="AA_and_codon", y="RSCU-1", fill="Organism", position=position_dodge (0.8)) +
+  scale_fill_brewer(palette = "Oranges") +
+  ggtitle("Relative Synonymous Codon Usage between E.coli and A.aceti") +
+  xlab("Amino Acid : Codon") +
+  theme(axis.text.x = element_text(size = 7, angle = 90, hjust=1, vjust=0.5))
 ```
+
 
 
 
