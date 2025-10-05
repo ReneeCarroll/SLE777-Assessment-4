@@ -1,10 +1,12 @@
 ---
-title: "SLE777_Renee Carroll_Assessment 4"
-author: "Renee Carroll"
-date: "2025-09-25"
+title: "SLE777 Bioinformatics Assessment 4"
+author: "Renee Carroll, s225723235"
+date: "2025-10-5"
 output: 
-  html_document:
-    toc: yes
+  html_document: 
+    toc: true
+    fig_width: 7
+    fig_height: 7
 theme: yeti
 ---
 
@@ -12,73 +14,121 @@ theme: yeti
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Part 1
-## Gene Expression Data
+# Part 1
+## Analysis of RNA-seq Expression Data
 
-The file “gene_expression.tsv” contains RNA-seq count data for three samples of interest.
+#### 1.1. Read in the file, making the gene identifiers the row names. Show a table of values for the first six genes.
 
-# 1. Read in the file, making the gene identifiers the row names. Show a table of values for the first six genes.
+To begin the analysis, the data file must first be read into R. 
+The following code will download the required data file, and will read it into R. 
+The code instructs that the first row of data contains the column headings, and the first column is to be used as row names. 
+It also specifies that the column separation is by tabs, and that all text columns should stay as character data, and not be converted to categorical variables.
 
 ```{r download files from GitHub, and show first 6 genes}
 URL1 = "https://raw.githubusercontent.com/ghazkha/Assessment4/refs/heads/main/gene_expression.tsv"
 download.file(URL1, destfile="gene_expression.tsv")
 gene_expression <- read.delim("gene_expression.tsv", header = TRUE, row.names = 1, sep = "\t", stringsAsFactors = FALSE)
+```
+
+The following table shows the expression data for the first six genes, for each of the three samples of interest.
+
+```{r}
 head(gene_expression)
 ```
 
-# 2. Make a new column which is the mean of the other columns. Show a table of values for the first six genes.
+### 1.2. Make a new column which is the mean of the other columns. Show a table of values for the first six genes.
+
+A new column can easily be created using the $ code. The new column is added to the end of the data frame.
+To this new column, we can save the row mean calculation of the expression values from the three samples, for each gene.
+The head() command displays a table of the first 6 genes from the now updated data frame.
 
 ```{r mean saved as new column}
 gene_expression$mean_expression <- rowMeans(gene_expression)
 head(gene_expression)
 ```
 
-# 3. List the 10 genes with the highest mean expression
+### 1.3. List the 10 genes with the highest mean expression
 
-```{r 10 genes with highest mean - whole table}
+In order to determine the highest mean expression, the data first must be put in order according to the column that contains the mean expression values.
+By including the - sign, it is ensured that the data is ordered from largest to smallest, and that is is ordering based on the column 'mean_expression'.
+The comma followed by the space prior to the closing square bracket instructs that all the columns are to be kept.
+
+With the data now ordered, the top 10 rows containing the genes with the highest mean expression can be subsetted into a new data frame.
+These genes can then be listed by retrieving the row names of this subsetted data frame.
+
+```{r 10 genes with highest mean}
 ordered_expression <- gene_expression[order(-gene_expression$mean_expression),]
 genes_highest_expression <- head(ordered_expression, 10)
-genes_highest_expression
 ```
 
-# Listing just the 10 gene names
+The 10 genes with the highest mean expression are:
 
-```{r 10 genes with highest mean - just names as a list}
-rownames(genes_highest_expression)
-```
+1. `r rownames(genes_highest_expression)[1]`
 
-# 4. Determine the number of genes with a mean < 10
+2. `r rownames(genes_highest_expression)[2]`
+
+3. `r rownames(genes_highest_expression)[3]`
+
+4. `r rownames(genes_highest_expression)[4]`
+
+5. `r rownames(genes_highest_expression)[5]`
+
+6. `r rownames(genes_highest_expression)[6]`
+
+7. `r rownames(genes_highest_expression)[7]`
+
+8. `r rownames(genes_highest_expression)[8]`
+
+9. `r rownames(genes_highest_expression)[9]`
+
+10. `r rownames(genes_highest_expression)[10]`
+
+
+### 1.4. Determine the number of genes with a mean < 10
+
+In order to determine the number of genes with mean expression <10, a subset is created from the main data frame with 'mean_expression<10' as the criteria for subsetting.
+The total number of genes in this subset can therefore be determined by retrieving the number of rows of this new subset data frame.
 
 ```{r number of genes with low expression < 10}
 low_exp_genes <- subset(gene_expression, mean_expression<10)
-nrow(low_exp_genes)
 ```
 
-# 5. Make a histogram plot of the mean values and include it into your report.
+The number of genes with a mean expression <10 is `r nrow(low_exp_genes)`.
 
-```{r histogram, fig_width: 7, fig_height: 7}
-hist(gene_expression$mean_expression, breaks=1000, main = "Mean Gene Expression", xlab="Mean Gene Expression", col="dodgerblue2")
-```
+### 1.5. Make a histogram plot of the mean values and include it into your report.
 
-As the data is highly positively skewed, it is best represented on a logarithmic scale.
+Histograms area useful way to visualize expression data. 
 
-```{r}
-log_gene_expression <- log(gene_expression+1) # Add 1 to each data point, to account for zeros in the dataset, as you cant take a log of zero.
-hist(log_gene_expression$mean_expression, breaks=50, main = "Mean Gene Expression", xlab="Log Mean Gene Expression", col="dodgerblue2")
-```
-As the graph is still highly skewed, lets remove lowly expressed genes with mean expression less than 10.
+Before we construct the graph, it is beneficial to first remove genes from the analysis where zero expression was detected in these samples. 
+In this way, we can better focus on the expression data from the genes that are expressed in these samples.
+
+Next, the histogram is created, with the column containing the mean expression values is selected from the appropriate data frame using the $ code.
+Additional bins are included to aid in visualising the data spread. Titles for the histogram and X axis, plus the colour, are also specified.
 
 ```{r histogram of log of values}
-gene_subset_expressionhigherthan10 <- subset(gene_expression, mean_expression>10)
-log_gene_subset_expressionhigherthan10 <- log(gene_subset_expressionhigherthan10)
-hist(log_gene_subset_expressionhigherthan10$mean_expression, breaks=50, main = "Mean Gene Expression", xlab = "Log Mean Gene Expression", col = "dodgerblue2")
+gene_exp_greaterthan0 <- subset(gene_expression, mean_expression>0)
+hist(gene_exp_greaterthan0$mean_expression, breaks=100, main = "Mean Gene Expression", xlab = "Mean Gene Expression", col = "dodgerblue2")
 ```
-## Part 1
+
+From this histogram, we can see that the vast majority of genes have very low expression. This severe right skewing of the data makes it difficult to glean useful information from this graph, as the large number of lowly expression genes dominates.
+
+Data with a distribution such as this is better visualized on a logarithmic scale.
+
+As there would be genes in this data with mean expression levels below 1, we can add 1 to all mean expression values, to ensure that the log of the values stays positive.
+
+Here is the resulting histogram.
+
+```{r}
+log_gene_exp_greaterthan0 <- log(gene_exp_greaterthan0+1)
+hist(log_gene_exp_greaterthan0$mean_expression, breaks=50, main = "Mean Gene Expression (log)", xlab = "Log Mean Gene Expression", col = "dodgerblue2")
+```
+
+# Part 1
 ## Tree Circumference Data
 
 The file “growth_data.csv” contains measurements for tree circumference growing at two sites, control site and treatment site which were planted 20 years ago.
 
-# 6. Import this csv file into an R object. What are the column names?
+### 6. Import this csv file into an R object. What are the column names?
 
 ```{r Import csv file}
 URL2 = "https://raw.githubusercontent.com/ghazkha/Assessment4/refs/heads/main/growth_data.csv"
@@ -90,7 +140,7 @@ growth_data <- read.csv("growth_data.csv") # read.csv automatically treats the f
 colnames(growth_data)
 ```
 
-# 7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
+### 7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
 
 ```{r}
 girth_stats_df <- data.frame(
@@ -103,7 +153,7 @@ girth_stats_df <- data.frame(
 print(girth_stats_df)
 ```
 
-# 8. Make a box plot of tree circumference at the start and end of the study at both sites.
+### 8. Make a box plot of tree circumference at the start and end of the study at both sites.
 
 ```{r boxplot of tree circumference at the start and end of the study at both sites}
 boxplot(
@@ -116,7 +166,7 @@ boxplot(
   main = "Increase in tree girth between 2005 and 2020, at each study site")
 ```
 
-# 9. Calculate the mean growth over the last 10 years at each site.
+### 9. Calculate the mean growth over the last 10 years at each site.
 
 ```{r mean growth over the last 10 years, northeast site}
 # Add a column to the existing dataframe, to contain the calculation of 2020 measurements minus the 2010 measurements.
@@ -130,7 +180,7 @@ mean_10yr_growth_df <- data.frame(
 print(mean_10yr_growth_df)
 ```
 
-# 10. Use the t.test to estimate the p-value that the 10 year growth is different at the two sites.
+### 10. Use the t.test to estimate the p-value that the 10 year growth is different at the two sites.
 The t.test() function returns an object containing various information, including:
 t-statistic: The calculated t-value.
 df: Degrees of freedom.
@@ -157,7 +207,8 @@ t.test(growth_2010_2020 ~ Site, data = growth_data, var.equal = FALSE) #var.equa
 t.test(growth_2010_2020 ~ Site, data = growth_data, var.equal = TRUE) #var.equal = TRUE: Include this if you assume equal variances between the groups (for a Student's t-test). Omit or set to FALSE for Welch's t-test (which doesn't assume equal variances).
 ```
 
-## Part 2 Examining biological sequence diversity
+# Part 2
+## Examining biological sequence diversity between E.coli and A.aceti
 
 In order to analyse sequence data, there are two packages we need to first install and load.
 
@@ -177,18 +228,18 @@ suppressPackageStartupMessages({
 })
 ```
 
-# 1. Download the whole set of coding DNA sequences for E. coli and your organism of interest. How many coding sequences are present in these organisms? Present this in the form of a table. Describe any differences between the two organisms. 
+### 1. Download the whole set of coding DNA sequences for E. coli and your organism of interest. How many coding sequences are present in these organisms? Present this in the form of a table. Describe any differences between the two organisms. 
 
 ```{r Download E.coli genome}
-URL3 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
-download.file(URL3, destfile="ecoli_cds.fa.gz")
-gunzip("ecoli_cds.fa.gz")
+#URL3 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
+#download.file(URL3, destfile="ecoli_cds.fa.gz")
+#gunzip("ecoli_cds.fa.gz")
 ```
 
 ```{r Download organism of interest, Acetobacter aceti GCA_002005445}
-URL4 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_80_collection/acetobacter_aceti_gca_002005445/cds/Acetobacter_aceti_gca_002005445.ASM200544v1.cds.all.fa.gz"
-download.file(URL4, destfile="aaceti_cds.fa.gz")
-gunzip("aaceti_cds.fa.gz")
+#URL4 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_80_collection/acetobacter_aceti_gca_002005445/cds/Acetobacter_aceti_gca_002005445.ASM200544v1.cds.all.fa.gz"
+#download.file(URL4, destfile="aaceti_cds.fa.gz")
+#gunzip("aaceti_cds.fa.gz")
 ```
 ```{r reading in the two sequence data files}
 ecoli_cds <- seqinr::read.fasta("ecoli_cds.fa")
@@ -212,14 +263,14 @@ cds_df <- data.frame(
 print(cds_df)
 ```
 
-# Describe any differences between the two organisms. 
+### Describe any differences between the two organisms. 
 ```{r percentage increase in number of coding sequences}
 percentage_increase <- (length(ecoli_cds)-length(aaceti_cds))/length(aaceti_cds)*100
 print(percentage_increase)
 ```
 The organism E.coli contains 24.6% more genes than the organism A.aceti, suggesting E.coli is a more complex organism.
 
-# 2. How much coding DNA is there in total for these two organisms? Present this in the form of a table. Describe any differences between the two organisms.
+### 2. How much coding DNA is there in total for these two organisms? Present this in the form of a table. Describe any differences between the two organisms.
 ```{r Table of the total amount of coding DNA for the two organisms}
 length_ecoli_genes <- as.numeric(summary(ecoli_cds)[,1])
 length_aaceti_genes <- as.numeric(summary(aaceti_cds)[,1])
@@ -230,7 +281,7 @@ cds_total_df <- data.frame(
 ) # Including the check.names = FALSE code so that R doesn't add '.' in between the words of the Column names.
 print(cds_total_df)
 ```
-# Describe any differences between the two organisms. 
+### Describe any differences between the two organisms. 
 ```{r percentage increase in total amount of coding sequences}
 percentage_increase_total <- (sum(length_ecoli_genes)-sum(length_aaceti_genes))/sum(length_aaceti_genes)*100
 print(percentage_increase_total)
@@ -238,7 +289,7 @@ print(percentage_increase_total)
 In line with a 24.6% increase in genes, E.coli contains a proportional increase in total coding sequence, with an increase of 22.9% above the total amount of coding DNA contained in A.aceti organisms.
 
 
-# 3. Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms. What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms.
+### 3. Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms. What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms.
 ```{r Boxplot of coding sequence length in these organisms}
 boxplot(length_ecoli_genes, length_aaceti_genes, names = c("E.coli", "A.aceti"), main = "Coding DNA Sequence Length in E.coli and A.aceti", ylab="Length (bp)")
 ```
@@ -273,14 +324,14 @@ cds_stats_df <- data.frame(
 print(cds_stats_df)
 ```
 
-# Describe any differences between the two organisms. 
+### Describe any differences between the two organisms. 
 
 
 
 
 
 
-# 4. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
+### 4. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence. Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
 
 ```{r Nucleotide composition of E.coli}
 # Unlist the DNA sequences from the 'ecoli_cds' data frame, save the sequences as a single vector called 'dna_ecoli'
@@ -368,8 +419,8 @@ print(aa_proportion_aaceti)
 ```
 
 ```{r Installing and loading ggplot2 and ggpubr for creating graphs}
-install.packages("ggplot2")
-install.packages("ggpubr")
+#install.packages("ggplot2")
+#install.packages("ggpubr")
 library("ggplot2")
 library("ggpubr")
 ```
@@ -427,10 +478,10 @@ ggbarplot(data=aa_proportion_df, x="Amino_Acids", y="Proportion_aa", fill="Organ
   scale_fill_brewer(palette = "Greens") 
 ```
 
-# Describe any differences between the two organisms. 
+### Describe any differences between the two organisms. 
 
 
-# 5. Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
+### 5. Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
 
 The RSCU stands for relative synonymous codon usage, which is a measure as to how preferred a codon of a particular amino acid is compared to the other codons which also encode it. A value of 1 indicating that the codon is used as expected. Values above 1 suggest that the codon is used more frequently than expected, while values below 1 indicate lower usage. For instance, codons like "aaa" and "att" show higher RSCU values, indicating they are used more often, whereas codons like "tga" and "tag" have lower values, suggesting less frequent use.
 
@@ -489,7 +540,7 @@ ggbarplot(data=ordered_codons_df, x="AA_and_codon", y="RSCU-1", fill="Organism",
 
 
 
-# 6. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
+### 6. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
 
 ```{r Extracting K-mers frequency for sizes 3, 4 and 5, and saving as separate data frames}
 # Determine all K-mers of size 3, and their frequency of use
@@ -585,11 +636,13 @@ print(Bottom_kmer3_df)
 
 ```{r Boxplot comparison of A.aceti top 10 k-mers}
 ggbarplot(data=Top_kmer3_df, x="Kmer", y="Frequency", fill="Organism", position=position_dodge (0.8))+
+  ggtitle("10 most over-represented 3 amino acid k-mers in A.aceti") +
   scale_fill_brewer(palette = "Greens") 
 ```
 
 ```{r Boxplot comparison of A.aceti bottom 10 k-mers}
 ggbarplot(data=Bottom_kmer3_df, x="Kmer", y="Frequency", fill="Organism", position=position_dodge (0.8))+
+  ggtitle("10 most under-represented 3 amino acid k-mers in A.aceti") +
   scale_fill_brewer(palette = "Reds") 
 ```
 
