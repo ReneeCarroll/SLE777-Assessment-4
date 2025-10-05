@@ -490,9 +490,109 @@ ggbarplot(data=ordered_codons_df, x="AA_and_codon", y="RSCU-1", fill="Organism",
 
 
 # 6. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
-```{r}
 
+```{r Extracting K-mers frequency for sizes 3, 4 and 5, and saving as separate data frames}
+# Determine all K-mers of size 3, and their frequency of use
+aaceti_kmer3 <- data.frame(count(aaceti_prot_total, wordsize=3, alphabet=aa, freq=TRUE))
+colnames(aaceti_kmer3) <- c("Kmer", "Frequency")
+
+# Order this data, lowest to highest, then extract the top 10 and save in a new data frame called 'aaceti_kmer3_bottom10'
+aaceti_kmer3 <- aaceti_kmer3[order(aaceti_kmer3$Frequency), ] 
+aaceti_kmer3_bottom10 <- head(aaceti_kmer3, 10)
+print(aaceti_kmer3_bottom10)
+
+# Order this data, from highest use to lowest, then extract the top 10 and save in a new data frame called 'aaceti_kmer3_top10'
+aaceti_kmer3 <- aaceti_kmer3[order(-aaceti_kmer3$Frequency), ] 
+aaceti_kmer3_top10 <- head(aaceti_kmer3, 10)
+print(aaceti_kmer3_top10)
+
+# Repeat this process for all K-mers of size 4 amino acids
+aaceti_kmer4 <- data.frame(count(aaceti_prot_total, wordsize=4, alphabet=aa, freq=TRUE))
+colnames(aaceti_kmer4) <- c("Kmer", "Frequency")
+
+aaceti_kmer4 <- aaceti_kmer4[order(aaceti_kmer4$Frequency), ] # Orders by frequency, smallest to largest
+aaceti_kmer4_bottom10 <- head(aaceti_kmer4, 10)
+print(aaceti_kmer4_bottom10)
+
+aaceti_kmer4 <- aaceti_kmer4[order(-aaceti_kmer4$Frequency), ] # Inclusion of - means this is now ordered by frequency, largest to smallest
+aaceti_kmer4_top10 <- head(aaceti_kmer4, 10)
+print(aaceti_kmer4_top10)
+
+# Repeat this process for all K-mers of size 5 amino acids
+aaceti_kmer5 <- data.frame(count(aaceti_prot_total, wordsize=5, alphabet=aa, freq=TRUE))
+colnames(aaceti_kmer5) <- c("Kmer", "Frequency")
+
+aaceti_kmer5 <- aaceti_kmer5[order(aaceti_kmer5$Frequency), ] # Orders by frequency, smallest to largest
+aaceti_kmer5_bottom10 <- head(aaceti_kmer5, 10)
+print(aaceti_kmer5_bottom10)
+
+aaceti_kmer5 <- aaceti_kmer5[order(-aaceti_kmer5$Frequency), ] # Inclusion of - means this is now ordered by frequency, largest to smallest
+aaceti_kmer5_top10 <- head(aaceti_kmer5, 10)
+print(aaceti_kmer5_top10)
 ```
+
+Given that there are K-mers of size 4 and 5 not used in A.aceti, whereas K-mers of size 3 are all present in the A.aceti proteome, further comparisons between A.aceti and E.coli will focus just on the 10 most over- and under-represented k-mers of size 3.
+
+```{r Extracting lists of the 10 most over- and under- represented 3 K-mers in A.aceti}
+# Extract list of bottom 10 3-K-mers
+Bottom10_kmer3 <- as.vector(aaceti_kmer3_bottom10$Kmer)
+print(Bottom10_kmer3)
+
+# Extract list of top 10 3-K-mers
+Top10_kmer3 <- as.vector(aaceti_kmer3_top10$Kmer)
+print(Top10_kmer3)
+```
+
+```{r Extracting frequencies of K-mers of size 3 in E.coli}
+# Determine all K-mers of size 3, and their frequency of use, in E.coli
+ecoli_kmer3 <- data.frame(count(ecoli_prot_total, wordsize=3, alphabet=aa, freq=TRUE))
+colnames(ecoli_kmer3) <- c("Kmer", "Frequency")
+```
+
+```{r}
+# Subset the E.coli list, using the top 10 A.aceti list, and save as a new df
+ecoli_kmer3_topsubset <- ecoli_kmer3[ecoli_kmer3$Kmer %in% Top10_kmer3, ]
+
+# Add a column for Organism, and note is as E.coli
+ecoli_kmer3_topsubset$Organism <- c("E.coli")
+print(ecoli_kmer3_topsubset)
+
+# Subset the E.coli list, using the bottom 10 A.aceti list, and save as a new df
+ecoli_kmer3_bottomsubset <- ecoli_kmer3[ecoli_kmer3$Kmer %in% Bottom10_kmer3, ]
+
+# Add a column for Organism, and note is as E.coli
+ecoli_kmer3_bottomsubset$Organism <- c("E.coli")
+print(ecoli_kmer3_bottomsubset)
+```
+
+```{r}
+#Prepare the A.aceti K-mer 3 data frames, by adding a column for organism
+aaceti_kmer3_bottom10$Organism <- c("A.aceti")
+aaceti_kmer3_top10$Organism <- c("A.aceti")
+
+# Merge the two organisms' data frames that contain the frequency data for the top 10 3-K-mers from A.aceti
+column_names_kmer3 <- colnames(aaceti_kmer3_bottom10)
+
+Top_kmer3_df <- rbind(aaceti_kmer3_top10, ecoli_kmer3_topsubset)
+names(Top_kmer3_df) <- column_names_kmer3
+print(Top_kmer3_df)
+
+# Merge the two organisms' data frames that contain the frequency data for the bottom 10 3-K-mers from A.aceti
+Bottom_kmer3_df <- rbind(aaceti_kmer3_bottom10, ecoli_kmer3_bottomsubset)
+names(Bottom_kmer3_df) <- column_names_kmer3
+print(Bottom_kmer3_df)
+```
+
+```{r Boxplot comparison of A.aceti top 10 k-mers}
+ggbarplot(data=Top_kmer3_df, x="Kmer", y="Frequency", fill="Organism", position=position_dodge (0.8))+
+  scale_fill_brewer(palette = "Greens") 
+```
+
+```{r Boxplot comparison of A.aceti bottom 10 k-mers}
+ggbarplot(data=Bottom_kmer3_df, x="Kmer", y="Frequency", fill="Organism", position=position_dodge (0.8))+
+  scale_fill_brewer(palette = "Reds") 
+```
+
 
 
 ```{r Recording Session Info}
