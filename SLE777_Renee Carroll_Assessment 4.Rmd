@@ -692,6 +692,23 @@ Overall, this analysis shows us that even though there is sequence diversity bet
 
 
 
+## Citations
+
+"car" package: Fox, J. & Weisberg, S. (2019) An R Companion to Applied Regression, 3rd edn. Sage, Thousand Oaks, CA. Available at: https://www.john-fox.ca/Companion/
+ (Accessed: 27 September 2025) 
+
+"seqinr" package: Charif, D. & Lobry, J. (2007) “SeqinR 1.0-2: a contributed package to the R project for statistical computing devoted to biological sequences retrieval and analysis.” In Bastolla, U., Porto, M., Roman, H. & Vendruscolo, M. (eds.) Structural approaches to sequence evolution: Molecules, networks, populations, Biological and Medical Physics, Biomedical Engineering series, Springer Verlag, New York, pp. 207–232. Available at: https://cran.r-project.org/web/packages/seqinr/citation.html
+ (Accessed: 25 September 2025) 
+
+"R.utils" package: R.utils: Various programming utilities for R [Computer software]. Available at: https://CRAN.R-project.org/package=R.utils
+ (Accessed: 25 September 2025)
+
+"ggplot2" package: Wickham, H. (2016) ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag, New York. Available at: https://ggplot2.tidyverse.org
+ (Accessed: 01 October 2025) 
+
+"ggpubr" package: Kassambara, A. (2025) ggpubr: ’ggplot2’ Based Publication Ready Plots [R package version 0.6.1]. Available at: https://rpkgs.datanovia.com/ggpubr/
+ (Accessed: 01 October 2025)
+
 
 ```{r Recording Session Info}
 sessionInfo()
