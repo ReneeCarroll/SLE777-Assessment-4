@@ -74,6 +74,8 @@ ordered_expression <- gene_expression[order(-gene_expression$mean_expression),]
 genes_highest_expression <- head(ordered_expression, 10)
 ```
 
+(Note: The following sentences contain in line code)
+
 The 10 genes with the highest mean expression are:
 
 1. `r rownames(genes_highest_expression)[1]`
@@ -105,6 +107,8 @@ The total number of genes in this subset can therefore be determined by retrievi
 ```{r number of genes with low expression < 10}
 low_exp_genes <- subset(gene_expression, mean_expression<10)
 ```
+
+(Note: The following sentences contain in line code)
 
 The number of genes with a mean expression <10 is `r nrow(low_exp_genes)`.
 
@@ -139,7 +143,7 @@ hist(log_gene_exp_greaterthan0$mean_expression, breaks=50, main = "Mean Gene Exp
 # Part 1
 ## Tree Circumference Data Analysis
 
-#### 1.6. Import this csv file into an R object. What are the column names?
+#### 1.6. Import this csv file into an R object. 
 
 The file “growth_data.csv” contains measurements for the circumferences of trees growing at two sites, a control site and a treatment site, which were planted 20 years ago.
 
@@ -154,6 +158,10 @@ download.file(URL2, destfile="growth_data.csv")
 growth_data <- read.csv("growth_data.csv") # read.csv automatically treats 
 ```
 
+#### What are the column names?
+
+(Note: The following sentences contain in line code)
+
 The column names of this data set are:
 
 1. `r colnames(growth_data)[1]`
@@ -167,6 +175,7 @@ The column names of this data set are:
 5. `r colnames(growth_data)[5]`
 
 6. `r colnames(growth_data)[6]`
+
 
 #### 1.7. Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
 
@@ -261,9 +270,11 @@ The recommendation is to keep monitoring tree growth at the two sites, and repea
 # Part 2
 ## Examining biological sequence diversity between E.coli and A.aceti
 
+
 Here in this report, we will perform a comparative analysis on the coding sequences of two bacteria, Escherichia coli (E.coli) and Acetobacter aceti (A.aceti).
 
 The analysis utilizes two packages installed and loaded earlier; the Seqinr package, to process and analyse sequence data, and the R.utils package, which is a general utilities package enabling files to be unzipped. 
+
 
 #### 2.1.1. Download the whole set of coding DNA sequences for E. coli and your organism of interest.
 
@@ -274,12 +285,12 @@ Both FASTA files are read into R using the read.fasta() code as part of the "seq
 
 ```{r Download E.coli coding DNA sequences}
 # Download the E.coli cds, and unzip the file.
-#URL3 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
+URL3 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
 #download.file(URL3, destfile="ecoli_cds.fa.gz")
 #gunzip("ecoli_cds.fa.gz")
 
 # Download the cds for my organism of interest, Acetobacter aceti GCA_002005445, and unzip the file.
-#URL4 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_80_collection/acetobacter_aceti_gca_002005445/cds/Acetobacter_aceti_gca_002005445.ASM200544v1.cds.all.fa.gz"
+URL4 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_80_collection/acetobacter_aceti_gca_002005445/cds/Acetobacter_aceti_gca_002005445.ASM200544v1.cds.all.fa.gz"
 #download.file(URL4, destfile="aaceti_cds.fa.gz")
 #gunzip("aaceti_cds.fa.gz")
 
@@ -310,7 +321,7 @@ The organism E.coli has `r (length(ecoli_cds)-length(aaceti_cds))` additional ge
 
 This data suggests that E.coli is a more complex organism than A.aceti, as a greater number of genes would result in a greater number of proteins, and hence additional or more complex biological functionality.
 
-#### 2. How much coding DNA is there in total for these two organisms? Present this in the form of a table.
+#### 2.2.1 How much coding DNA is there in total for these two organisms? Present this in the form of a table.
 
 In order to determine the total amount of coding DNA for each organism, we can perform the 'summary()' code to show the length of each coding sequence (presented in the first column). Then, we can take the values from this first column and save this information as a new number vector. Taking the sum of these new vectors gives us the total amount of coding DNA for each organism, which can then be saved as a data frame and presented in the form of a table, as shown below. 
 
@@ -326,13 +337,13 @@ knitr::kable(cds_total_df,
              caption = "Table 6. Total quantity of coding DNA in E.coli and A.aceti")
 ```
 
-#### Describe any differences between the two organisms. 
+#### 2.2.2. Describe any differences between the two organisms. 
 
 (Note: The following sentences contain in line code)
 
 In line with the previous observation that E.coli contains `r round((length(ecoli_cds)-length(aaceti_cds))/length(aaceti_cds)*100, 1)`% more genes than A.aceti, we can further determine that E.coli has a proportinal increase in the total amount of coding sequence as well, namely, that E.coli contains `r  round((sum(length_ecoli_genes)-sum(length_aaceti_genes))/sum(length_aaceti_genes)*100, 1)`% more coding DNA in total. This further supports the hypothesis that E.coli is a more complex organism than A.aceti.
 
-### 3. Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms. 
+#### 2.3.1. Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms. 
 
 Using the vectors of cDNA lengths just created, the boxplot can be easily generated. 
 
@@ -340,7 +351,7 @@ Using the vectors of cDNA lengths just created, the boxplot can be easily genera
 boxplot(length_ecoli_genes, length_aaceti_genes, names = c("E.coli", "A.aceti"), main = "Coding DNA Sequence Lengths in E.coli and A.aceti", ylab="Length of cDNA (bp)", col=c("red", "blue"))
 ```
 
-### What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms. 
+#### 2.3.2 What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms. 
 
 (Note: The following sentences contain in line code)
 
@@ -348,9 +359,9 @@ The average length of a coding sequence in E.coli is `r round(mean(length_ecoli_
 
 Together with the boxplot shows in Figure 4 above, this data reveals that the transcriptomes of E.coli and A.aceti are comparable in terms of gene length. In both organisms, the vast majority of coding sequences are around the 800-900 bp length, with both organisms having a smaller number of very large genes, in the approximate range of 2500-8000 bp long, as shown by the data points above the plots' upper whisker lines. The presence of these large genes are the reason the calculated average length is larger than the calculated median length, in both organisms. 
 
-### 4. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Create a bar plot for nucleotide frequency. 
+#### 2.4.1. Calculate the frequency of DNA bases in the total coding sequences for both organisms. Create a bar plot for nucleotide frequency. 
 
-Using the 'unlist()' command, the DNA sequences from each organisms coding DNA sequence (cds) data frame can be saved as a separate vector. The 'count()' command can then be used on this vector, with the instruction to count the number of nucleotides present in the vector in combinations of 1's (ie. single nucleotides, a, c, g, and t), saving this result as another object.
+Using the 'unlist()' command, the cDNA sequences from each organism's coding DNA sequence (cds) data frame can be saved as a separate vector. The 'count()' command can then be used on this vector, with the instruction to count the number of nucleotides present in the vector in combinations of 1's (ie. as single nucleotides, a, c, g, and t), saving this result as another object.
 
 The proportion of each nucleotide in each organism's total coding sequence can then be calculated, with the results graphed in a grouped bar graph, using the packages "ggplot2" and "ggpubr" (see Figure 5).
 
@@ -371,7 +382,7 @@ dna_proportion_aaceti <- dna_composition_aaceti/sum(dna_composition_aaceti)
 dna_proportion_aaceti <- round(dna_proportion_aaceti, digits = 3)
 ```
 
-``` {r Creating the bar chart for nucleotide frequencies using ggplot2, fig.cap="*Figure 5. Grouped bar chat showing the frequencies of nucleotide composition in the two orgfanisms, E.coli and A.aceti.*"}
+``` {r Creating the bar chart for nucleotide frequencies using ggplot2, fig.cap="*Figure 5. Grouped bar chat showing the frequencies of nucleotide composition in the two organisms, E.coli and A.aceti.*"}
 # Create data frames from the nucleotide proportions, and add the column for Organism
 dna_proportion_ecoli_df <- as.data.frame(dna_proportion_ecoli)
 dna_proportion_ecoli_df$Organism <- c("E.coli")
@@ -394,20 +405,20 @@ ggbarplot(data=proportion_df, x="Nucleotide", y="Proportion", fill="Organism", p
   scale_fill_brewer(palette = "Blues") 
 ```
 
-### Describe any differences between the two organisms.
+#### 2.4.2. Describe any differences between the two organisms.
 
 While nucleotide composition is comparable between E.coli and A.aceti, it is observed that the coding genome of the organism of interest, A.aceti, contains an decreased proportion of adenine (a) and thymine (t), and an increased proportion of cytosine (c) and guanine (g), as compared to the coding genome of E.coli. 
 
-### 4. Calculate the frequency of amino acids in the total protein sequences for both organisms. Create a bar plot for amino acid frequency. 
+#### 2.4.3. Calculate the frequency of amino acids in the total protein sequences for both organisms. Create a bar plot for amino acid frequency. 
 
-In order to analyse the protein sequences in these organisms, the coding sequences must first be translated.
-Here, the lapply function performs a loop, applying the 'translate' code to all elements of each organisms's 'cds' data, and the output is saved as new object. 
+In order to analyse the protein sequences in these organisms, the coding sequences must first be translated to their respective protein sequences.
+Here, the lapply function performs a loop, applying the 'translate' code to all elements of each organisms's cDNA data, and the output is saved as new object. 
 
-Next, the 'unlist()' command is again used to extract the amino acid sequences from the newly created data objects, and saving the total protein sequence as a new single vector. 
+Next, the 'unlist()' command is again used to extract the amino acid sequences from the newly created data objects, and the total protein sequence is saving as a new single vector. 
 
-We then use the count() command again, but we first must define the list of possible amino acids which the count() command is to reference. To do this, we can determine the unique elements present in one of the organism's proteome vectors, remove all stop codons, and save it as a new vector 'aa', as outlined in the code chunk below. When the count() command is used here, we then define the alphabet to be the newly created 'aa' vector, and the wordsize to be 1 (ie. single amino acids).
+We then use the count() command again, but we first must define the list of possible amino acids which the count() command is to reference. To do this, we can determine the unique elements present in one of the organism's proteome vectors, remove all asterisks that represent the stop codons, and save it as a new vector 'aa'. Then, when the count() command is used here, we define the alphabet to be the newly created 'aa' vector, and the wordsize to be 1, such that the number of each of the single amino acids is calculated from the organisms entire proteome.
 
-The proportion of each amino acid in each organism's total protein sequence can then be calculated, with the results graphed in a grouped bar graph, using the packages "ggplot2" and "ggpubr" (see Figure 6).
+The proportion of each amino acid in the total proteome can then be calculated for each organism, with the results graphed in a grouped bar graph, using the packages "ggplot2" and "ggpubr" (see Figure 6).
 
 ```{r Determining the frequency of amino acids in the total protein sequences of each organism}
 # Translate the cDNA for each organism
@@ -435,90 +446,81 @@ aa_proportion_aaceti <- aa_composition_aaceti/sum(aa_composition_aaceti)
 aa_proportion_aaceti <- round(aa_proportion_aaceti, digits = 3)
 ```
 
-
-###### RESUME FROM HERE #########
-
-
-```{r Bar chat for amino acid frequencies}
-#Create data frames from the aa proportions, which are currently in table format, and add the column for Organism
+```{r Creating the bar chart for amino acid frequencies using ggplot2, fig.cap="*Figure 5. Grouped bar chat showing the frequencies of amino acid composition in the two organisms, E.coli and A.aceti.*"}
+#Create data frames from the aa proportions, and add the column for Organism
 aa_proportion_ecoli_df <- as.data.frame(aa_proportion_ecoli)
 aa_proportion_ecoli_df$Organism <- c("E.coli")
+
 aa_proportion_aaceti_df <- as.data.frame(aa_proportion_aaceti)
 aa_proportion_aaceti_df$Organism <- c("A.aceti")
 
-#Merge the two data frames together, to be one data frame
+#Merge the two data frames together, to create one data frame for the bar plot
 aa_proportion_df <- rbind(aa_proportion_ecoli_df, aa_proportion_aaceti_df)
 names(aa_proportion_df) <- c("Amino_Acids", "Proportion_aa", "Organism_aa") 
-knitr::kable(aa_proportion_df,
-             caption = "Table 7. ____")
-```
 
-Making the bar graphs
-```{r bar chart for amino acid frequencies}
 #Defining the variables for the grouped bar chart
 Organism_aa <- aa_proportion_df$Organism_aa
 Amino_Acids <- aa_proportion_df$Amino_Acids
 Proportion_aa <- aa_proportion_df$Proportion_aa
 
 #Create the grouped bar chart
-#The code specifies the dataframe to use, and then which variables to plot where. It defines the position is side-by-side with the code 'position=position_dodge', and ensures there is a space between the columns with the code '(0.8)'. A green colour palette was chosen for the graph with the code scale_fill_brewer(palette = "Greens".
+#The code specifies the data frame to use, and then which variables to plot where. It defines the position is side-by-side with the code 'position=position_dodge', and ensures there is a space between the columns with the code '(0.8)'. A green colour palette was chosen for the graph with the code scale_fill_brewer(palette = "Greens").
 ggbarplot(data=aa_proportion_df, x="Amino_Acids", y="Proportion_aa", fill="Organism_aa", position=position_dodge (0.8))+
   scale_fill_brewer(palette = "Greens") 
 ```
 
-### Describe any differences between the two organisms. 
+#### 2.4.4. Describe any differences between the two organisms. 
 
+The grouped bar chart in Figure 5 reveals that the proportion of each amino acid comprising the proteome of each organism, E.coli and A.aceti, is very comparable. There are only marginal differences, most notably observed with the slightly increased use of A (Alanine), G (Glycine), P (Proline), and R (Arginine) in A.aceti versus E.coli, and a decreased use of I (Isoleucine), K (Lysine), N (Asparagine), and Q (Glutamine).  
 
+#### 2.5.1. Create a codon usage table and quantify the codon usage bias among all coding sequences. 
 
+Given that there is degeneracy in the DNA code, in that the majority of amino acids can be coded for by more than one codon, it is interesting to investigate whether organisms show any preferential usage for particular codons for the same amino acid, and to compare this between species. 
 
+Codon usage can be calculated by the 'uco()' command as part of the "seqinr" package. In order to calculate codon usage for all coding genes in each organism, the command is used on the vectors of 'unlisted' cDNA sequences, and the output is saved as a new data frame.
 
+The code here includes instructions to calculate the RSCU value, which stands for Relative Synonymous Codon Usage. 
+This is a measure that tells us whether there is any preferential usage of a particular codon for a particular amino acid, as compared to the relative usage of other codons for that same amino acid. 
 
+The two codon usage data frames are then merged into a new data frame, for easy vewing in Table 7 below.
 
-
-
-
-
-
-
-
-
-
-
-### 5. Create a codon usage table and quantify the codon usage bias among all coding sequences. Describe any differences between the two organisms with respect to their codon usage bias. Provide charts to support your observations.
-
-The RSCU stands for relative synonymous codon usage, which is a measure as to how preferred a codon of a particular amino acid is compared to the other codons which also encode it. A value of 1 indicating that the codon is used as expected. Values above 1 suggest that the codon is used more frequently than expected, while values below 1 indicate lower usage. For instance, codons like "aaa" and "att" show higher RSCU values, indicating they are used more often, whereas codons like "tga" and "tag" have lower values, suggesting less frequent use.
-
-```{r Creating the codon usage table FIRST ATTEMPT, BUT THE ROWS ARE JUST ADDED TO EACH OTHER. SHOULD I HAVE INSTEAD ADDED JUST THE COLUMN DATA?}
+```{r Creating the codon usage table}
 # Create the codon usage data frame for E.coli, showing RSCU values. 
-codons_ecoli_df <- uco(dna_ecoli,index="rscu",as.data.frame=TRUE)
-print(codons_ecoli_df)
+codons_ecoli_df <- uco(dna_ecoli, index = "rscu", as.data.frame=TRUE)
+codons_ecoli_table <- codons_ecoli_df
+colnames(codons_ecoli_table) <- c("AA", "codon", "E.coli_eff", "E.coli_freq", "E.coli_RSCU")
 
 # Create the codon usage data frame for A.aceti, showing RSCU values
-codons_aaceti_df <- uco(dna_aaceti,index="rscu",as.data.frame=TRUE)
-print(codons_aaceti_df)
+codons_aaceti_df <- uco(dna_aaceti, index = "rscu", as.data.frame=TRUE)
+codons_aaceti_table <- codons_aaceti_df
+colnames(codons_aaceti_table) <- c("AA", "codon", "A.aceti_eff", "A.aceti_freq", "A.aceti_RSCU")
+
+# Creating a new data frame from 'codons_ecoli_df' data frame, and adding the A.aceti columns from the 'codons_aaceti_df' data frame.
+codons_table <- codons_ecoli_table
+codons_table$A.aceti_eff <- codons_aaceti_table$A.aceti_eff
+codons_table$A.aceti_freq <- codons_aaceti_table$A.aceti_freq
+codons_table$A.aceti_RSCU <- codons_aaceti_table$A.aceti_RSCU
+knitr::kable(codons_table,
+             row.names = FALSE,
+             caption = "Table 7. Codon usage statistics of E.coli and A.aceti. AA: Amino Acid three leter code, codon: encoding codon, eff: total codon counts, freq: relative frequencies, RSCU: Relative Synonymous Codon Usage.")
 ```
 
-#### IF I HAVE TIME IT WOULD BE GOOD TO PUT THIS IN ONE TABLE, THOUGH IM NOT SURE IF THAT ONE TABLE WOULD BE EASY TO GRAPH TOGETHER OR NOT.
-```{r ATTEMPT TO ADD THESE INTO ONE TABLE}
-# Set the column names to include which organism it is
+#### 2.5.2. Provide charts to support your observations.
 
-# OR CREATE A NEW DATAFRAME, WITH SELECTED FEATURES OF THE OTHER TWO, TO MAKE A DATAFRAME THAT HAS JUST THE AA, CODON, AND RSCU VALUE.
+The RSCU value is useful to focus on when comparing codon preference between organisms. 
+An RSCU value of 1 means the codon is used as expected, values above 1 indicate the codon is being used more frequently than expected, and values below 1 indicate the codon is being used less frequently. 
 
-# Merge the rows required
-```
+The following code sets up a new data frame which is then the source for creating a grouped bar plot of Relative Synonymous Codon Usage in the organisms E.coli and A.aceti. By subtracting 1 from all RSCU values, the relative usage patters can be more easily discernible, as they fall either above or below a zero line, as seen in Figure 6(a) and Figure 6(b) below. 
 
-```{r Grouped bar chart for RSCU values, minus 1}
-# Add a column for organism name
+```{r Creating the data frame which will be used to create the grouped bar chart for RSCU values}
+# Using the original codon data frames, add a column for organism name
 codons_ecoli_df$Organism <- c("E.coli")
-
-# Add a column for organism name
 codons_aaceti_df$Organism <- c("A.aceti")
 
-# Merge these dataframes into one
-column_names <- colnames(codons_ecoli_df)
-codons_df <- rbind(codons_ecoli_df, codons_aaceti_df)
-names(codons_df) <- column_names
-print(codons_df)
+# Merge these data frames into one
+column_names <- colnames(codons_ecoli_df) # creates the vector of column names
+codons_df <- rbind(codons_ecoli_df, codons_aaceti_df) # combines the rows of data
+names(codons_df) <- column_names # assigns the column names of the new data frame to be the names from the set vector
 
 # Create a new column that calculates the RSCU value minus 1, such that values are either above or below a zero line.
 codons_df$"RSCU-1" <- codons_df$RSCU-1
@@ -526,128 +528,189 @@ codons_df$"RSCU-1" <- codons_df$RSCU-1
 # Create a new column that contains the amino acid name plus it's codon
 codons_df$"AA_and_codon" <- paste(codons_df$AA, ":", codons_df$codon)
 
-# Put the data in alphabetical order, according to the amino acid 3 letter code, and print the resulting table
+# Put the data in alphabetical order, according to the amino acid 3 letter code
 ordered_codons_df <- codons_df[order(codons_df$AA), ]
-print(ordered_codons_df)
 ```
 
-```{r Grouped barplot showing RSCU-1 values for E.coli and A.aceti}
-# In the theme() component, I've set the column text size to 7, have adjusted the angle to 90 degrees,have justified the lables to be straight against the x-axis, and have shifted them left such that they line up under the tick lines. 
-ggbarplot(data=ordered_codons_df, x="AA_and_codon", y="RSCU-1", fill="Organism", position=position_dodge (0.8)) +
+```{r Grouped barplot (a) showing RSCU-1 values, fig.cap="*Figure 6(a). Grouped bar chat showing Relative Synonymous Codon Usage in E.coli and A.aceti, for the first subset of amino acids. RSCU values minus 1 are shown on the y axis, and on the x axis is each of the amino acids and their various respective codons.*"}
+# Subsetting the data frame using [] after the data frame name, to select rows 1 to 70 to graph.
+# In the theme() component, I've set the column text size to 10, have adjusted the angle to 90 degrees, have justified the labels to be straight against the x-axis, and have shifted them left such that they line up under the tick lines. 
+ggbarplot(data=ordered_codons_df[1:70, ], x="AA_and_codon", y="RSCU-1", fill="Organism", position=position_dodge (0.8)) +
   scale_fill_brewer(palette = "Oranges") +
   ggtitle("Relative Synonymous Codon Usage between E.coli and A.aceti") +
   xlab("Amino Acid : Codon") +
-  theme(axis.text.x = element_text(size = 7, angle = 90, hjust=1, vjust=0.5))
+  theme(axis.text.x = element_text(size = 10, angle = 90, hjust=1, vjust=0.5))
+```
+```{r Grouped barplot (b) showing RSCU-1 values, fig.cap="*Figure 6 (b). Grouped bar chat showing Relative Synonymous Codon Usage in E.coli and A.aceti, for the second subset of amino acids. RSCU values minus 1 are shown on the y axis, and on the x axis is each of the amino acids and their various respective codons. Note that 'Stp' refers to stop codons, and not a specific amino acid.*"}
+# Subsetting the data frame using [] after the data frame name, to select rows 71 to 128 to graph.
+# In the theme() component, I've set the column text size to 10, have adjusted the angle to 90 degrees, have justified the labels to be straight against the x-axis, and have shifted them left such that they line up under the tick lines. 
+ggbarplot(data=ordered_codons_df[71:128, ], x="AA_and_codon", y="RSCU-1", fill="Organism", position=position_dodge (0.8)) +
+  scale_fill_brewer(palette = "Oranges") +
+  ggtitle("Relative Synonymous Codon Usage between E.coli and A.aceti") +
+  xlab("Amino Acid : Codon") +
+  theme(axis.text.x = element_text(size = 10, angle = 90, hjust=1, vjust=0.5))
 ```
 
+#### 2.5.3. Describe any differences between the two organisms with respect to their codon usage bias. 
 
+Figure 6 (a) and (b) reveals that while there are many codons being used to similar frequencies in E.coli and A.aceti, such as the Leucine codon 'ctg', there are also some interesting differences, such as the preferred codon usage for Serine, which in A.aceti is 'tcc' and in E.coli is 'agc'. Also interesting is the preferred different in Stop codon usgae, as denoted by 'Stp' in Figure 6 (b), with A.aceti preferencing the codon 'tga' and E.coli preferencing the codon 'taa'.
 
+Such differences in codon preference provide interesting insights into the evolutionary histories of these two bacteria.
 
-### 6. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? Provide plots to support your observations. Why do you think these sequences are present at different levels in the genomes of these organisms?
+#### 2.6.1. In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most over- and under-represented k-mers in your organism of interest. Are these k-mers also over- and under-represented in E. coli to a similar extent? 
+
+K-mers are short substrings of biological sequence of a fixed length, denoted by 'k'. 
+Here, we'll investigate the presence of protein sequence k-mers in the total protein sequences of E.coli and A.aceti, of length 3, 4 and 5 amino acids.
+
+To achieve this, we'll again use the 'count()' command with the 'aa' alphabet, but this time we'll instruct the word size to be either 3, 4, or 5, to return the counts for k-mers of 3, 4 and 5 amino acids in length, respectively. Adding the code 'freq=TRUE' ensures the frequencies are also calculated.
+
+Once these calculations have been saved to a new data frame, the data can then be ordered by frequency value, and top and bottom 10 rows saved to new data frames, using the head() and tail() commands, thus subsetting the most- and least- frequently used k-mers of each size. 
+
+These calculations can be seen in in Tables 8 to 13 below.
 
 ```{r Extracting K-mers frequency for sizes 3, 4 and 5, and saving as separate data frames}
 # Determine all K-mers of size 3, and their frequency of use
 aaceti_kmer3 <- data.frame(count(aaceti_prot_total, wordsize=3, alphabet=aa, freq=TRUE))
 colnames(aaceti_kmer3) <- c("Kmer", "Frequency")
 
-# Order this data, lowest to highest, then extract the top 10 and save in a new data frame called 'aaceti_kmer3_bottom10'
-aaceti_kmer3 <- aaceti_kmer3[order(aaceti_kmer3$Frequency), ] 
-aaceti_kmer3_bottom10 <- head(aaceti_kmer3, 10)
-print(aaceti_kmer3_bottom10)
-
-# Order this data, from highest use to lowest, then extract the top 10 and save in a new data frame called 'aaceti_kmer3_top10'
-aaceti_kmer3 <- aaceti_kmer3[order(-aaceti_kmer3$Frequency), ] 
+# Order this data by frequency, highest to lowest, then extract the top 10 and bottom 10 rows, to save in new data frames
+aaceti_kmer3 <- aaceti_kmer3[order(-aaceti_kmer3$Frequency), ] # the minus sign before the data frame name makes the ordering highest to lowest.
 aaceti_kmer3_top10 <- head(aaceti_kmer3, 10)
-print(aaceti_kmer3_top10)
+aaceti_kmer3_bottom10 <- tail(aaceti_kmer3, 10)
 
 # Repeat this process for all K-mers of size 4 amino acids
 aaceti_kmer4 <- data.frame(count(aaceti_prot_total, wordsize=4, alphabet=aa, freq=TRUE))
 colnames(aaceti_kmer4) <- c("Kmer", "Frequency")
 
-aaceti_kmer4 <- aaceti_kmer4[order(aaceti_kmer4$Frequency), ] # Orders by frequency, smallest to largest
-aaceti_kmer4_bottom10 <- head(aaceti_kmer4, 10)
-print(aaceti_kmer4_bottom10)
-
-aaceti_kmer4 <- aaceti_kmer4[order(-aaceti_kmer4$Frequency), ] # Inclusion of - means this is now ordered by frequency, largest to smallest
+# Order this data by frequency, highest to lowest, then extract the top 10 and bottom 10 rows, to save in new data frames
+aaceti_kmer4 <- aaceti_kmer4[order(-aaceti_kmer4$Frequency), ] # the minus sign before the data frame name makes the ordering highest to lowest.
 aaceti_kmer4_top10 <- head(aaceti_kmer4, 10)
-print(aaceti_kmer4_top10)
+aaceti_kmer4_bottom10 <- tail(aaceti_kmer4, 10)
 
 # Repeat this process for all K-mers of size 5 amino acids
 aaceti_kmer5 <- data.frame(count(aaceti_prot_total, wordsize=5, alphabet=aa, freq=TRUE))
 colnames(aaceti_kmer5) <- c("Kmer", "Frequency")
 
-aaceti_kmer5 <- aaceti_kmer5[order(aaceti_kmer5$Frequency), ] # Orders by frequency, smallest to largest
-aaceti_kmer5_bottom10 <- head(aaceti_kmer5, 10)
-print(aaceti_kmer5_bottom10)
-
-aaceti_kmer5 <- aaceti_kmer5[order(-aaceti_kmer5$Frequency), ] # Inclusion of - means this is now ordered by frequency, largest to smallest
+# Order this data by frequency, highest to lowest, then extract the top 10 and bottom 10 rows, to save in new data frames
+aaceti_kmer5 <- aaceti_kmer5[order(-aaceti_kmer5$Frequency), ] # the minus sign before the data frame name makes the ordering highest to lowest.
 aaceti_kmer5_top10 <- head(aaceti_kmer5, 10)
-print(aaceti_kmer5_top10)
+aaceti_kmer5_bottom10 <- tail(aaceti_kmer5, 10)
+
+# Create all tables
+knitr::kable(aaceti_kmer3_top10,
+             row.names = FALSE,
+             caption = "Table 8. Ten most frequently used amino acid 3-mers in A.aceti.")
+
+knitr::kable(aaceti_kmer3_bottom10,
+             row.names = FALSE,
+             caption = "Table 9. Ten least frequently used amino acid 3-mers in A.aceti.")
+
+knitr::kable(aaceti_kmer4_top10,
+             row.names = FALSE,
+             caption = "Table 10. Ten most frequently used amino acid 4-mers in A.aceti.")
+
+knitr::kable(aaceti_kmer4_bottom10,
+             row.names = FALSE,
+             caption = "Table 11. Ten least frequently used amino acid 4-mers in A.aceti.")
+
+knitr::kable(aaceti_kmer5_top10,
+             row.names = FALSE,
+             caption = "Table 12. Ten most frequently used amino acid 5-mers in A.aceti.")
+
+knitr::kable(aaceti_kmer5_bottom10,
+             row.names = FALSE,
+             caption = "Table 13. Ten least frequently used amino acid 5-mers in A.aceti.")
 ```
 
-Given that there are K-mers of size 4 and 5 not used in A.aceti, whereas K-mers of size 3 are all present in the A.aceti proteome, further comparisons between A.aceti and E.coli will focus just on the 10 most over- and under-represented k-mers of size 3.
+This analysis reveals that there are many 4-mers and 5-mers which are not present at all in the proteome of A.aceti, as revealed by frequencies of zero in Tables 11 and 13 above. 
+In addition, the frequency values returned for the top most used 3-mers are all larger than the frequency values for the top most used 4-mers and 5-mers. This is as expected, given that increased length of k-mer also brings increased specialty, and and hence is present at a reduced frequency within the same data set.
+
+For these reasons, further comparisons between A.aceti and E.coli will focus just on 3-mers.
+
+In order to ascertain in E.coli the frequency of the same 3-mers identified to be the most and least used in A.aceti, as shown in Tables 8 and 9 respectively, we first extract the list of these 20 3-mers, saving as separate vectors.
+
+After the counts of all 3-mers has been performed on the E.coli total protein sequence, using the 'count()' command as with A.aceti, we can then subset the E.coli 3-mer data frame to select just for the rows containing the 10 most- and 10 least- frequently used 3-mers from A.aceti, saving the data as separate data frames.
 
 ```{r Extracting lists of the 10 most over- and under- represented 3 K-mers in A.aceti}
-# Extract list of bottom 10 3-K-mers
-Bottom10_kmer3 <- as.vector(aaceti_kmer3_bottom10$Kmer)
-print(Bottom10_kmer3)
-
-# Extract list of top 10 3-K-mers
 Top10_kmer3 <- as.vector(aaceti_kmer3_top10$Kmer)
-print(Top10_kmer3)
+Bottom10_kmer3 <- as.vector(aaceti_kmer3_bottom10$Kmer)
 ```
 
-```{r Extracting frequencies of K-mers of size 3 in E.coli}
-# Determine all K-mers of size 3, and their frequency of use, in E.coli
+```{r Extracting frequency data of 3-mers in E.coli proteome}
 ecoli_kmer3 <- data.frame(count(ecoli_prot_total, wordsize=3, alphabet=aa, freq=TRUE))
 colnames(ecoli_kmer3) <- c("Kmer", "Frequency")
 ```
 
-```{r}
+```{r Subsetting the E.coli lists of 3-mers}
 # Subset the E.coli list, using the top 10 A.aceti list, and save as a new df
-ecoli_kmer3_topsubset <- ecoli_kmer3[ecoli_kmer3$Kmer %in% Top10_kmer3, ]
-
-# Add a column for Organism, and note is as E.coli
-ecoli_kmer3_topsubset$Organism <- c("E.coli")
-print(ecoli_kmer3_topsubset)
+# This code tells R to save to a new data frame all columns of data from rows in the 'ecoli_kmer3' data frame, where the values in the 'Kmer' column match a value in the 'Top10_kmer3' vector. 
+ecoli_kmer3_topsubset <- ecoli_kmer3[ecoli_kmer3$Kmer %in% Top10_kmer3, ] 
+ecoli_kmer3_topsubset$Organism <- c("E.coli") # Add a column for Organism, and note it as E.coli
 
 # Subset the E.coli list, using the bottom 10 A.aceti list, and save as a new df
 ecoli_kmer3_bottomsubset <- ecoli_kmer3[ecoli_kmer3$Kmer %in% Bottom10_kmer3, ]
-
-# Add a column for Organism, and note is as E.coli
-ecoli_kmer3_bottomsubset$Organism <- c("E.coli")
-print(ecoli_kmer3_bottomsubset)
+ecoli_kmer3_bottomsubset$Organism <- c("E.coli") # Add a column for Organism, and note it as E.coli
 ```
 
-```{r}
+#### 2.6.2. Provide plots to support your observations of k-mer usage between E.coli and your organism of interest. 
+
+Now that the 3-mer frequencies have been determined in E.coli for the same 3-mers identified in A.aceti, we can present this data as grouped bar plots.
+
+```{r Preparing the data frame}
 #Prepare the A.aceti K-mer 3 data frames, by adding a column for organism
 aaceti_kmer3_bottom10$Organism <- c("A.aceti")
 aaceti_kmer3_top10$Organism <- c("A.aceti")
 
 # Merge the two organisms' data frames that contain the frequency data for the top 10 3-K-mers from A.aceti
-column_names_kmer3 <- colnames(aaceti_kmer3_bottom10)
-
+column_names_kmer3 <- colnames(aaceti_kmer3_bottom10) # Sets what the column names will be
 Top_kmer3_df <- rbind(aaceti_kmer3_top10, ecoli_kmer3_topsubset)
 names(Top_kmer3_df) <- column_names_kmer3
-print(Top_kmer3_df)
 
 # Merge the two organisms' data frames that contain the frequency data for the bottom 10 3-K-mers from A.aceti
 Bottom_kmer3_df <- rbind(aaceti_kmer3_bottom10, ecoli_kmer3_bottomsubset)
 names(Bottom_kmer3_df) <- column_names_kmer3
-print(Bottom_kmer3_df)
 ```
 
-```{r Boxplot comparison of A.aceti top 10 k-mers}
+```{r Boxplot comparison of A.aceti top 10 k-mers, fig.cap="*Figure 7. Grouped bar chat showing frequency of top-10 3-mers in A.aceti, and their relative occurence in the E.coli proteome.*"}
+# This line keeps the levels in the same order as they appear in the table, and not graphed in alphabetical order, as is default for ggplot. As there are duplicates in the Kmer column, the 'levels = ' code specifies for only unique factors.
+Top_kmer3_df$Kmer <- factor(Top_kmer3_df$Kmer, levels = unique(Top_kmer3_df$Kmer))
 ggbarplot(data=Top_kmer3_df, x="Kmer", y="Frequency", fill="Organism", position=position_dodge (0.8))+
-  ggtitle("10 most over-represented 3 amino acid k-mers in A.aceti") +
+  ggtitle("Ten most over-represented amino acid 3-mers in A.aceti, \n with comparison to frequency of presentation in E.coli") +
   scale_fill_brewer(palette = "Greens") 
 ```
 
-```{r Boxplot comparison of A.aceti bottom 10 k-mers}
+```{r Boxplot comparison of A.aceti bottom 10 k-mers, fig.cap="*Figure 8. Grouped bar chat showing frequency of bottom-10 3-mers in A.aceti, and their relative occurence in the E.coli proteome.*"}
+# This line keeps the levels in the same order as they appear in the table, and not graphed in alphabetical order, as is default for ggplot. As there are duplicates in the Kmer column, the 'levels = ' code specifies for only unique factors.
+Bottom_kmer3_df$Kmer <- factor(Bottom_kmer3_df$Kmer, levels = unique(Bottom_kmer3_df$Kmer))
 ggbarplot(data=Bottom_kmer3_df, x="Kmer", y="Frequency", fill="Organism", position=position_dodge (0.8))+
-  ggtitle("10 most under-represented 3 amino acid k-mers in A.aceti") +
+  ggtitle("Ten most under-represented amino acid 3-mers in A.aceti, \n with comparison to frequency of presentation in E.coli") +
   scale_fill_brewer(palette = "Reds") 
 ```
+
+#### 2.6.3. Why do you think these sequences are present at different levels in the genomes of these organisms?
+
+Figures 7 and 8 show the ten most over- and under-represented 3-mers in A.aceti, respectively, with their corresponding frequencies observed in E.coli as comparison. These bar plots clearly show differences in observed frequencies between the two organisms, with E.coli having lower representation of 7/10 of A.aceti's most over-represented 3-mers, and higher representation of 9/10 of A.aceti's most under-represented 3-mers.
+
+However, in order to clearly visualize the relative difference of these differences in frequencies, it's helpful to see the data on the same bar plot, as shown below in Figure 9.
+
+```{r Boxplot comparison of A.aceti bottom and top 10 k-mers, fig.cap="*Figure 9. Grouped bar chat showing frequency of bottom-10 3-mers and top-10 kmers in A.aceti, and their relative occurence in the E.coli proteome.*"}
+# Combine the two data frames, and order first by organism, then by frequency
+combined_kmer3_df <- rbind(Top_kmer3_df, Bottom_kmer3_df)
+combined_kmer3_df <- combined_kmer3_df[order(combined_kmer3_df$Organism, combined_kmer3_df$Frequency), ]
+
+# This first line again keeps the order as per the data frame, and not alphabetical.
+combined_kmer3_df$Kmer <- factor(combined_kmer3_df$Kmer, levels = unique(combined_kmer3_df$Kmer))
+ggbarplot(data=combined_kmer3_df, x="Kmer", y="Frequency", fill="Organism", position=position_dodge (0.8))+
+  ggtitle("Ten most under- and over-represented amino acid 3-mers in A.aceti, \n with comparison to frequency of presentation in E.coli") +
+  scale_fill_brewer(palette = "Purples")+
+  theme(axis.text.x = element_text(size = 10, angle = 90, hjust=1, vjust=0.5))
+```
+
+While there are observable differences to 3-mer representation, as shown in Figures 7 and 8 above, when observed relatively on the same boxplot, as shown in Figure 9, these differences are not overwhelming. The ten least represented 3-mers in A.aceti, are similarly very infrequent in E.coli, and similarly the ten most-represented 3-mers in A.aceti, are also frequently observed in E.coli. 
+
+Overall, this analysis shows us that even though there is sequence diversity between these two bacteria species, they are nevertheless phylogenetically close.
+
+
 
 
 
