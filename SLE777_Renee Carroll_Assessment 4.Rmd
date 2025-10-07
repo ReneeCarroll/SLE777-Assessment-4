@@ -541,6 +541,7 @@ ggbarplot(data=ordered_codons_df[1:70, ], x="AA_and_codon", y="RSCU-1", fill="Or
   xlab("Amino Acid : Codon") +
   theme(axis.text.x = element_text(size = 10, angle = 90, hjust=1, vjust=0.5))
 ```
+
 ```{r Grouped barplot (b) showing RSCU-1 values, fig.cap="*Figure 6 (b). Grouped bar chat showing Relative Synonymous Codon Usage in E.coli and A.aceti, for the second subset of amino acids. RSCU values minus 1 are shown on the y axis, and on the x axis is each of the amino acids and their various respective codons. Note that 'Stp' refers to stop codons, and not a specific amino acid.*"}
 # Subsetting the data frame using [] after the data frame name, to select rows 71 to 128 to graph.
 # In the theme() component, I've set the column text size to 10, have adjusted the angle to 90 degrees, have justified the labels to be straight against the x-axis, and have shifted them left such that they line up under the tick lines. 
