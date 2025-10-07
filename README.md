@@ -22,18 +22,6 @@ Questions 6-10 are focused on analyzing tree growth data from a .csv file.
 Part 2 is a deeper exploration of biological sequence diversity between two organisms, E.coli, and separate organism allocated specifically to me, namely, Acetobacter aceti (A.aceti, GCA_002005445).
 This part comprises 6 sections, each with a number of questions to guide the data exploration.
 
-### Packages required - Summary
-
-The packages required for this Assessment are:
-
-"car"
-"seqinr"
-"R.utils"
-"ggplot2"
-"ggpubr"
-
-The first code chunk in the RMarkdown document provides the code to install and run these packages, albeit with the install code inactivated by #.
-Should the user require these packages installed, simply remove the # in front of the install code to activate this code again.
 
 ### Data downloads required - Summary
 
@@ -45,12 +33,29 @@ URL3 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacte
 URL4 = "https://ftp.ensemblgenomes.ebi.ac.uk/pub/bacteria/release-62/fasta/bacteria_80_collection/acetobacter_aceti_gca_002005445/cds/Acetobacter_aceti_gca_002005445.ASM200544v1.cds.all.fa.gz"
 
 ## Please note: In section 2.1.1, the code to download an unzip the bacteria sequence files has been supressed with #, as it was inhibiting R.Markdown's Knit function during project development.
-
 Should the user not already have this data downloaded and available, the code will need to be activated again by removing the # prior to running the R.Markdown file.
 
 # All Scripts, with Explanations
 
-Note that in the R.Markdown report, all scripts have "echo=FALSE" included, so the code chuncks do not appear in the final report.
+Note that in the R.Markdown report, all scripts have "echo=FALSE" included, so the code chunks do not appear in the final report.
+
+The packages required for this Assessment are included in the first code chunk, albeit with the install code inactivated by #.
+Should the user require these packages installed, simply remove the # in front of the install code to activate this code again.
+The code to run each package is included without a #. The message 'suppressPackageStartupMessages' ensures the startup messages are not rendered to the report.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("car")
+#install.packages("seqinr")
+#install.packages("R.utils")
+#install.packages("ggplot2")
+#install.packages("ggpubr")
+suppressPackageStartupMessages(library(car))
+suppressPackageStartupMessages(library(seqinr))
+suppressPackageStartupMessages(library(R.utils))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggpubr))
+```
 
 # Part 1
 ## Analysis of RNA-seq Expression Data
